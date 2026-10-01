@@ -62,6 +62,7 @@ const getCategoryEmoji = (category: string) => {
   const c = category.toUpperCase();
   if (c.includes("NON_VEG") || c.includes("CHICKEN") || c.includes("MUTTON")) return "🍗";
   if (c.includes("VEG")) return "🥗";
+  if (c.includes("MOMO")) return "🥟";
   if (c.includes("COMBO") || c.includes("PLATTER")) return "🍱";
   if (c.includes("RICE") || c.includes("BIRYANI")) return "🍚";
   if (c.includes("SNACK")) return "🍳";

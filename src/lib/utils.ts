@@ -92,10 +92,11 @@ export function getCategoryBadge(category: MenuCategory | string): { label: stri
     case "FRIED_RICE":
     case "RICE":
       return { label: "Fried-Rice", color: "bg-yellow-500/20 text-yellow-300 border-yellow-500/40" };
+    case "MOMO":
+      return { label: "Momo", color: "bg-orange-500/20 text-orange-300 border-orange-500/40" };
     case "SNACK":
     case "SNACKS":
-    case "MOMO":
-      return { label: "Snack", color: "bg-orange-500/20 text-orange-300 border-orange-500/40" };
+      return { label: "Snack", color: "bg-amber-600/20 text-amber-300 border-amber-600/40" };
     case "COFFEE_TEA":
       return { label: "Coffee and Tea", color: "bg-teal-500/20 text-teal-300 border-teal-500/40" };
     case "COLD_DRINK":

@@ -9,6 +9,7 @@ export type OrderStatus = "ACTIVE" | "COMPLETED" | "CANCELLED";
 export type MenuCategory =
   | "NON_VEG"
   | "VEG_ITEMS"
+  | "MOMO"
   | "COMBO"
   | "FRIED_RICE"
   | "SNACK"

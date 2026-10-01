@@ -95,13 +95,9 @@ export default function DashboardLandingPage() {
   };
 
   const refreshAll = async () => {
-    try {
-      await Promise.all([fetchTables(), fetchMetrics()]);
-    } catch {
-      toast.error("Failed to load dashboard data");
-    } finally {
-      setLoading(false);
-    }
+    // Instantly show tables without waiting for heavy analytics aggregation
+    fetchTables().finally(() => setLoading(false));
+    fetchMetrics();
   };
 
   useEffect(() => {

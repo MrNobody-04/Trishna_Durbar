@@ -54,6 +54,7 @@ export function LiveBillModal({
   const [paymentNotes, setPaymentNotes] = useState<string>("");
   const [submittingPayment, setSubmittingPayment] = useState(false);
   const [settling, setSettling] = useState(false);
+  const [cancellingBill, setCancellingBill] = useState(false);
 
   // Discount Inputs
   const [discountPercentInput, setDiscountPercentInput] = useState<string>("");
@@ -279,7 +280,6 @@ export function LiveBillModal({
   };
 
   // 6b. VOID / CANCEL ENTIRE BILL (Frees table, records in history, zero revenue impact)
-  const [cancellingBill, setCancellingBill] = useState(false);
   const handleVoidBill = async () => {
     const confirmed = window.confirm(
       `Are you sure you want to cancel and delete this entire bill for ${table?.name}?\n\n• The table will be immediately cleared and marked available.\n• The bill will remain in history & audit trail as CANCELLED.\n• The amount will NOT be counted in revenue or sales.`

@@ -89,12 +89,7 @@ export default function AnalyticsPage() {
       {/* Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-3xl bg-durbar-card border border-amber-500/30">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/30">
-              Financial Intelligence & KPIs
-            </span>
-          </div>
-          <h1 className="text-2xl font-black text-amber-200 mt-2">
+          <h1 className="text-2xl font-black text-amber-200">
             Analytics
           </h1>
           <p className="text-xs text-slate-400 mt-1">

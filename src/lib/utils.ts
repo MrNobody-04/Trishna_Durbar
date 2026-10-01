@@ -80,22 +80,31 @@ export function getFloorLabel(floor: FloorArea | string): string {
 
 export function getCategoryBadge(category: MenuCategory | string): { label: string; color: string } {
   switch (category) {
+    case "NON_VEG":
     case "CHICKEN":
-      return { label: "चिकन (Chicken)", color: "bg-amber-500/20 text-amber-300 border-amber-500/40" };
     case "MUTTON":
-      return { label: "मटन (Mutton)", color: "bg-red-500/20 text-red-300 border-red-500/40" };
+      return { label: "Non-Veg", color: "bg-amber-500/20 text-amber-300 border-amber-500/40" };
+    case "VEG_ITEMS":
     case "VEG":
-      return { label: "भेज (Veg)", color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40" };
+      return { label: "Veg-Items", color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40" };
     case "COMBO":
-      return { label: "कम्बो (Combo)", color: "bg-purple-500/20 text-purple-300 border-purple-500/40" };
+      return { label: "Combo", color: "bg-purple-500/20 text-purple-300 border-purple-500/40" };
+    case "FRIED_RICE":
     case "RICE":
-      return { label: "राइस (Rice)", color: "bg-yellow-500/20 text-yellow-300 border-yellow-500/40" };
-    case "MOMO":
-      return { label: "म:म: (Momo)", color: "bg-orange-500/20 text-orange-300 border-orange-500/40" };
+      return { label: "Fried-Rice", color: "bg-yellow-500/20 text-yellow-300 border-yellow-500/40" };
+    case "SNACK":
     case "SNACKS":
-      return { label: "नास्ता (Snacks)", color: "bg-teal-500/20 text-teal-300 border-teal-500/40" };
+    case "MOMO":
+      return { label: "Snack", color: "bg-orange-500/20 text-orange-300 border-orange-500/40" };
+    case "COFFEE_TEA":
+      return { label: "Coffee and Tea", color: "bg-teal-500/20 text-teal-300 border-teal-500/40" };
+    case "COLD_DRINK":
     case "BEVERAGE":
-      return { label: "Soft पेय (Drinks)", color: "bg-cyan-500/20 text-cyan-300 border-cyan-500/40" };
+      return { label: "Cold Drink", color: "bg-cyan-500/20 text-cyan-300 border-cyan-500/40" };
+    case "HARD_DRINK":
+      return { label: "Hard Drink", color: "bg-red-500/20 text-red-300 border-red-500/40" };
+    case "HOOKAH_SMOKE":
+      return { label: "Hookah & Smoke", color: "bg-slate-500/20 text-slate-300 border-slate-500/40" };
     default:
       return { label: category, color: "bg-slate-500/20 text-slate-300 border-slate-500/40" };
   }

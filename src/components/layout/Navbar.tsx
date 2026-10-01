@@ -129,28 +129,8 @@ export function Navbar() {
           <RoyalDurbarLogo size="md" />
         </Link>
 
-        {/* Live Nepal Time (Desktop Royal Pill) */}
-        <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-foreground shadow-xs">
-          <Clock className="h-3.5 w-3.5 text-amber-500" />
-          <span className="font-mono font-bold">{nepalTime || "Kathmandu Time"}</span>
-          <span className="text-[10px] text-amber-600/80 dark:text-amber-400/80 font-bold uppercase tracking-wider">
-            (NST)
-          </span>
-        </div>
-
-        {/* User Identity, Theme Toggle & Controls */}
+        {/* Theme Toggle & Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {isAuth && user && (
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-secondary/80 dark:bg-[#15120c] border border-amber-500/35 shadow-xs">
-              <div className="h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/30" />
-              <div className="text-left">
-                <p className="text-xs font-black text-foreground leading-tight">{user.name || "Staff"}</p>
-                <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 tracking-wide">
-                  👑 {getRoleBadge(user.role)}
-                </p>
-              </div>
-            </div>
-          )}
 
           {/* Tactile 3D Theme Switcher */}
           {mounted && (

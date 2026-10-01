@@ -38,6 +38,7 @@ import { LiveBillModal } from "@/components/pos/LiveBillModal";
 import { PrintReceiptModal } from "@/components/pos/PrintReceiptModal";
 import { PaymentQrModal } from "@/components/payment-qr/PaymentQrModal";
 import { ManageTablesModal } from "@/components/tables/ManageTablesModal";
+import { RoyalDurbarClockWeather } from "@/components/dashboard/RoyalDurbarClockWeather";
 import { toast } from "sonner";
 
 const FLOORS: { id: string; label: string; sub: string; icon: string }[] = [
@@ -512,6 +513,9 @@ export default function DashboardLandingPage() {
           </div>
         </div>
       </div>
+
+      {/* ⏱️ ROYAL NEPAL CHRONOMETER & LIVE WEATHER FORECAST */}
+      <RoyalDurbarClockWeather />
 
       {/* MODALS */}
       <OrderModal

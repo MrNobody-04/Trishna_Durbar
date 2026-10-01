@@ -60,15 +60,15 @@ const FLOOR_CATEGORIES: { id: FloorArea; label: string; sub: string; icon: strin
 
 const getCategoryEmoji = (category: string) => {
   const c = category.toUpperCase();
-  if (c.includes("CHICKEN")) return "🍗";
-  if (c.includes("MUTTON")) return "🥩";
+  if (c.includes("NON_VEG") || c.includes("CHICKEN") || c.includes("MUTTON")) return "🍗";
   if (c.includes("VEG")) return "🥗";
-  if (c.includes("MOMO")) return "🥟";
-  if (c.includes("RICE") || c.includes("BIRYANI")) return "🍚";
-  if (c.includes("SNACK") || c.includes("BREAKFAST")) return "🥪";
-  if (c.includes("DRINK") || c.includes("BEVERAGE") || c.includes("TEA") || c.includes("COFFEE")) return "☕";
   if (c.includes("COMBO") || c.includes("PLATTER")) return "🍱";
-  if (c.includes("HOOKAH")) return "💨";
+  if (c.includes("RICE") || c.includes("BIRYANI")) return "🍚";
+  if (c.includes("SNACK")) return "🍳";
+  if (c.includes("COFFEE") || c.includes("TEA")) return "☕";
+  if (c.includes("COLD_DRINK")) return "🥤";
+  if (c.includes("HARD_DRINK") || c.includes("BAR")) return "🍺";
+  if (c.includes("HOOKAH") || c.includes("SMOKE")) return "💨";
   return "🍽️";
 };
 
@@ -189,7 +189,7 @@ export function OrderModal({
   }, [menuItems, selectedCategory, searchQuery]);
 
   const getItemDisplayName = (item: MenuItemRecord) => {
-    return item.nameNepali ? `${item.nameNepali} (${item.nameEnglish})` : item.nameEnglish;
+    return item.nameNepali ? `${item.nameEnglish} (${item.nameNepali})` : item.nameEnglish;
   };
 
   // O(1) instantaneous lookup map for dish quantities in the basket
@@ -591,14 +591,14 @@ export function OrderModal({
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
                           <h4 className="text-sm font-black text-foreground group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
-                            {item.nameNepali}
+                            {item.nameEnglish}
                           </h4>
                           <span className="text-[9px] font-black text-amber-800 dark:text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-500/40 uppercase shrink-0 shadow-xs">
                             {item.portion}
                           </span>
                         </div>
                         <p className="text-[11px] font-medium text-muted-foreground truncate mt-0.5">
-                          {item.nameEnglish}
+                          {item.nameNepali}
                         </p>
                         {item.comboItems && (
                           <span className="inline-flex items-center gap-1 mt-1 text-[9px] font-bold text-amber-700 dark:text-amber-300 bg-amber-500/15 px-1.5 py-0.5 rounded border border-amber-500/30">

@@ -7,14 +7,15 @@ export type TableStatus = "AVAILABLE" | "OCCUPIED" | "RESERVED" | "MAINTENANCE";
 export type OrderStatus = "ACTIVE" | "COMPLETED" | "CANCELLED";
 
 export type MenuCategory =
-  | "CHICKEN"
-  | "MUTTON"
-  | "VEG"
+  | "NON_VEG"
+  | "VEG_ITEMS"
   | "COMBO"
-  | "RICE"
-  | "MOMO"
-  | "SNACKS"
-  | "BEVERAGE";
+  | "FRIED_RICE"
+  | "SNACK"
+  | "COFFEE_TEA"
+  | "COLD_DRINK"
+  | "HARD_DRINK"
+  | "HOOKAH_SMOKE";
 
 export type PortionType = "REGULAR" | "HALF" | "FULL" | "MINI" | "LARGE" | "PIECE";
 

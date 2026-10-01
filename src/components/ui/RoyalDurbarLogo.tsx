@@ -241,9 +241,6 @@ export function RoyalDurbarLogo({
             >
               TRISHNA DURBAR
             </span>
-            <span className="hidden md:inline-flex text-[9px] font-black tracking-widest text-amber-800 dark:text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-md border border-amber-500/40 uppercase shadow-xs">
-              RESTRO & BAR
-            </span>
           </div>
           <span className="text-[10px] sm:text-[11px] font-bold text-amber-800/90 dark:text-amber-400/90 tracking-wide font-sans">
             तृष्णा दरबार • शाही स्वाद र आतिथ्य

@@ -52,13 +52,7 @@ export default function AuditLogsPage() {
     <div className="space-y-6">
       {/* Banner */}
       <div className="p-6 rounded-3xl bg-durbar-card border border-amber-500/30">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/30">
-            Immutable Audit Trail
-          </span>
-          <span className="text-xs text-slate-400">• Security & Access Logs</span>
-        </div>
-        <h1 className="text-2xl font-black text-amber-200 mt-2">
+        <h1 className="text-2xl font-black text-amber-200">
           System Audit Logs
         </h1>
         <p className="text-xs text-slate-400 mt-1">

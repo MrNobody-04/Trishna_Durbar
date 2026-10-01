@@ -67,7 +67,7 @@ export default function MenuPage() {
   // Add Item State
   const [newNameNepali, setNewNameNepali] = useState("");
   const [newNameEnglish, setNewNameEnglish] = useState("");
-  const [newCategory, setNewCategory] = useState("CHICKEN");
+  const [newCategory, setNewCategory] = useState("NON_VEG");
   const [newPortion, setNewPortion] = useState("REGULAR");
   const [newPrice, setNewPrice] = useState("");
   const [newDescription, setNewDescription] = useState("");
@@ -278,13 +278,7 @@ export default function MenuPage() {
       {/* Header Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 sm:p-6 rounded-3xl bg-card dark:bg-[#080808] border border-border dark:border-white/10 shadow-lg">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/30">
-              Complete Digital Menu & Offers
-            </span>
-            <span className="text-xs text-muted-foreground">• {items.length} Dishes</span>
-          </div>
-          <h1 className="text-2xl font-black text-foreground mt-2">
+          <h1 className="text-2xl font-black text-foreground">
             Trishna Durbar Menu & Special Combos
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
@@ -386,7 +380,7 @@ export default function MenuPage() {
                   <div className="overflow-hidden">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <h3 className="text-base font-black text-foreground">
-                        {item.nameNepali}
+                        {item.nameEnglish}
                       </h3>
                       {isCombo && (
                         <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/40">
@@ -395,7 +389,7 @@ export default function MenuPage() {
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground font-medium mt-0.5">
-                      {item.nameEnglish}
+                      {item.nameNepali}
                     </p>
                   </div>
                   <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/25 shrink-0">

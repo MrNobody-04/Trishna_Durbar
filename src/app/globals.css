@@ -164,3 +164,16 @@ body {
   background: rgba(8, 8, 8, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
+
+/* Prevent mobile auto-zoom on input focus */
+@media screen and (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+button, a, input, select {
+  touch-action: manipulation;
+}

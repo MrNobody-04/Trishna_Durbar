@@ -19,6 +19,35 @@ export default function AuditLogsPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const formatActionBadge = (action: string) => {
+    switch (action) {
+      case "USER_LOGIN":
+        return (
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+            Staff Login
+          </span>
+        );
+      case "USER_LOGOUT":
+        return (
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30">
+            Staff Logout
+          </span>
+        );
+      case "ORDER_DELETED":
+        return (
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/15 text-red-400 border border-red-500/30">
+            Order Deleted
+          </span>
+        );
+      default:
+        return (
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+            {action}
+          </span>
+        );
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Banner */}
@@ -27,13 +56,13 @@ export default function AuditLogsPage() {
           <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/30">
             Immutable Audit Trail
           </span>
-          <span className="text-xs text-slate-400">• Security & Operational Logs</span>
+          <span className="text-xs text-slate-400">• Security & Access Logs</span>
         </div>
         <h1 className="text-2xl font-black text-amber-200 mt-2">
           System Audit Logs
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          Chronological record of order creations, dish additions, payment settlements, expense records, and staff authorizations.
+          Chronological security record of user logins, logouts, and order deletion authorizations.
         </p>
       </div>
 
@@ -47,7 +76,7 @@ export default function AuditLogsPage() {
                 <th className="px-4 py-3">Action</th>
                 <th className="px-4 py-3">Staff User</th>
                 <th className="px-4 py-3">Entity</th>
-                <th className="px-4 py-3">Metadata</th>
+                <th className="px-4 py-3">Details</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/80">
@@ -56,8 +85,8 @@ export default function AuditLogsPage() {
                   <td className="px-4 py-3 font-mono text-slate-400 whitespace-nowrap">
                     {formatNepalDateTime(log.timestamp)}
                   </td>
-                  <td className="px-4 py-3 font-bold text-amber-300">
-                    {log.action}
+                  <td className="px-4 py-3">
+                    {formatActionBadge(log.action)}
                   </td>
                   <td className="px-4 py-3">
                     <span className="font-semibold text-slate-200">{log.userName}</span>

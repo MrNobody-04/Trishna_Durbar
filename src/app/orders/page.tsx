@@ -19,11 +19,14 @@ import {
   DollarSign,
   Utensils,
   ChevronRight,
+  Trash2,
+  ShieldAlert,
 } from "lucide-react";
 import { formatNpr, formatNepalDateTime, formatOrderNumber, getFloorLabel } from "@/lib/utils";
 import { toast } from "sonner";
 import { PrintReceiptModal } from "@/components/pos/PrintReceiptModal";
-import { DiningTableData } from "@/types";
+import { DiningTableData, SessionUser } from "@/types";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface OrderItem {
   id: string;
@@ -92,6 +95,13 @@ export default function OrderHistoryPage() {
   const [printMode, setPrintMode] = useState<"BILL" | "KOT">("BILL");
   const [printModalOpen, setPrintModalOpen] = useState(false);
 
+  // Current User for RBAC checks (Only OWNER can delete orders)
+  const [currentUser, setCurrentUser] = useState<SessionUser | null>(null);
+  const [orderToDelete, setOrderToDelete] = useState<OrderRecord | null>(null);
+  const [deletingOrder, setDeletingOrder] = useState(false);
+
+  const isOwner = currentUser?.role === "OWNER";
+
   const fetchOrders = useCallback(async () => {
     try {
       const url = new URL("/api/orders", window.location.origin);
@@ -115,11 +125,48 @@ export default function OrderHistoryPage() {
 
   useEffect(() => {
     fetchOrders();
+    fetch("/api/auth/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.user) setCurrentUser(data.user);
+      })
+      .catch(() => {});
   }, [fetchOrders]);
 
   const handleRefresh = () => {
     setRefreshing(true);
     fetchOrders();
+  };
+
+  const executeDeleteOrder = async () => {
+    if (!orderToDelete) return;
+    if (!isOwner) {
+      toast.error("Permission denied: Only the restaurant Owner can delete order records");
+      setOrderToDelete(null);
+      return;
+    }
+
+    setDeletingOrder(true);
+    try {
+      const res = await fetch(`/api/orders/${orderToDelete.id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to delete order");
+
+      toast.success(
+        `Order #${formatOrderNumber(orderToDelete)} deleted permanently by Owner`
+      );
+      if (selectedOrder?.id === orderToDelete.id) {
+        setSelectedOrder(null);
+      }
+      setOrderToDelete(null);
+      fetchOrders();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete order");
+    } finally {
+      setDeletingOrder(false);
+    }
   };
 
   const handleOpenPrint = (order: OrderRecord, mode: "BILL" | "KOT") => {
@@ -195,13 +242,7 @@ export default function OrderHistoryPage() {
       {/* Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 sm:p-6 rounded-3xl bg-card dark:bg-[#080808] border border-border dark:border-white/10 shadow-lg">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/30">
-              POS Records & Audit
-            </span>
-            <span className="text-xs text-muted-foreground">• Nepal Standard Time (NST)</span>
-          </div>
-          <h1 className="text-2xl font-black text-foreground mt-2">
+          <h1 className="text-2xl font-black text-foreground">
             Order Tracking & History
           </h1>
           <p className="text-xs text-muted-foreground mt-1 max-w-2xl">
@@ -404,6 +445,15 @@ export default function OrderHistoryPage() {
                           >
                             <Printer className="h-4 w-4" />
                           </button>
+                          {isOwner && (
+                            <button
+                              onClick={() => setOrderToDelete(o)}
+                              className="p-1.5 rounded-lg bg-red-500/15 hover:bg-red-500/25 text-red-500 transition-colors"
+                              title="Delete Order (Owner Only)"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -539,23 +589,38 @@ export default function OrderHistoryPage() {
             )}
 
             {/* Action Buttons */}
-            <div className="flex justify-end gap-2 pt-2 border-t border-border dark:border-white/10">
-              <button
-                type="button"
-                onClick={() => handleOpenPrint(selectedOrder, "KOT")}
-                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-secondary hover:bg-secondary/80 text-foreground border border-border transition-colors flex items-center gap-1.5"
-              >
-                <Printer className="h-3.5 w-3.5 text-amber-500" />
-                <span>Print KOT</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleOpenPrint(selectedOrder, "BILL")}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 shadow-md shadow-amber-500/20 flex items-center gap-1.5"
-              >
-                <Printer className="h-3.5 w-3.5" />
-                <span>Print Customer Bill</span>
-              </button>
+            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-3 border-t border-border dark:border-white/10">
+              <div>
+                {isOwner && (
+                  <button
+                    type="button"
+                    onClick={() => setOrderToDelete(selectedOrder)}
+                    className="px-3.5 py-2 rounded-xl text-xs font-bold bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 transition-colors flex items-center justify-center gap-1.5"
+                    title="Delete Order Record (Owner Only)"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    <span>Delete Order</span>
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleOpenPrint(selectedOrder, "KOT")}
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold bg-secondary hover:bg-secondary/80 text-foreground border border-border transition-colors flex items-center gap-1.5"
+                >
+                  <Printer className="h-3.5 w-3.5 text-amber-500" />
+                  <span>Print KOT</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleOpenPrint(selectedOrder, "BILL")}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 shadow-md shadow-amber-500/20 flex items-center gap-1.5"
+                >
+                  <Printer className="h-3.5 w-3.5" />
+                  <span>Print Customer Bill</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -567,6 +632,23 @@ export default function OrderHistoryPage() {
         onClose={() => setPrintModalOpen(false)}
         table={printTableData}
         mode={printMode}
+      />
+
+      {/* Owner Confirmation Dialog for Deleting Orders */}
+      <ConfirmDialog
+        isOpen={!!orderToDelete}
+        title="Delete Order Record"
+        message={
+          orderToDelete
+            ? `Are you sure you want to permanently delete Order #${formatOrderNumber(orderToDelete)} (${orderToDelete.table.name} - ${formatNpr(orderToDelete.totalAmount)})? This action cannot be undone and will be recorded in the security audit log.`
+            : ""
+        }
+        confirmLabel="Yes, Delete Order"
+        cancelLabel="Cancel"
+        variant="danger"
+        isLoading={deletingOrder}
+        onConfirm={executeDeleteOrder}
+        onCancel={() => setOrderToDelete(null)}
       />
     </div>
   );

@@ -288,7 +288,7 @@ export default function DashboardLandingPage() {
           <div>
             <h2 className="text-lg sm:text-xl font-black text-foreground flex items-center gap-2">
               <Layers className="h-5 w-5 text-amber-500" />
-              Restaurant Floor Matrix ({tables.length} Tables)
+              Restaurant AND Live Order
             </h2>
             <p className="text-xs text-muted-foreground">
               Select a floor zone to filter tables, view running bills, and dispatch KOTs

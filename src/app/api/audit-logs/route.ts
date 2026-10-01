@@ -8,7 +8,12 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const limit = Number(searchParams.get("limit")) || 50;
 
+    const ALLOWED_ACTIONS = ["USER_LOGIN", "USER_LOGOUT", "ORDER_DELETED"];
+
     const logs = await prisma.auditLog.findMany({
+      where: {
+        action: { in: ALLOWED_ACTIONS },
+      },
       orderBy: { timestamp: "desc" },
       take: limit,
       include: {

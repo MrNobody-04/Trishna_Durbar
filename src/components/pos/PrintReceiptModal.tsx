@@ -159,9 +159,6 @@ export function PrintReceiptModal({
               <div className="pt-3 text-center text-[9px] text-gray-600 space-y-1">
                 <p className="font-bold">Thank you for dining with us!</p>
                 <p>Trishna Durbar Restaurant & Bar</p>
-                <p className="text-[8px] font-semibold text-gray-500 pt-1 border-t border-gray-200">
-                  System Developed by SUJANGC
-                </p>
               </div>
             ) : (
               <div className="pt-2 text-center text-[9px] text-gray-600 border-t border-dashed border-gray-400">

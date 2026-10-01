@@ -85,6 +85,8 @@ export function LiveBillModal({
         if (it.id) initialPrices[it.id] = it.unitPrice.toString();
       });
       setEditingItemPrices(initialPrices);
+      const initRem = Math.max(0, (o.totalAmount || 0) - (o.paidAmount || 0));
+      setPaymentAmount(initRem > 0 ? initRem.toString() : "");
     }
   }, [
     table?.activeOrder?.id,
@@ -128,6 +130,8 @@ export function LiveBillModal({
     if (!isNaN(pct) && pct >= 0 && pct <= 100) {
       const computedRupees = (subtotal * pct) / 100;
       setDiscountRupeesInput(computedRupees > 0 ? computedRupees.toFixed(0) : "");
+      const newRem = Math.max(0, subtotal - computedRupees - paidAmount);
+      setPaymentAmount(newRem > 0 ? newRem.toString() : "");
       
       try {
         const res = await fetch(`/api/orders/${currentOrder.id}/discount`, {
@@ -141,6 +145,8 @@ export function LiveBillModal({
       } catch {}
     } else if (val === "") {
       setDiscountRupeesInput("");
+      const newRem = Math.max(0, subtotal - paidAmount);
+      setPaymentAmount(newRem > 0 ? newRem.toString() : "");
       try {
         const res = await fetch(`/api/orders/${currentOrder.id}/discount`, {
           method: "POST",
@@ -161,6 +167,8 @@ export function LiveBillModal({
     if (!isNaN(disc) && disc >= 0) {
       const pct = subtotal > 0 ? ((disc / subtotal) * 100).toFixed(1) : "0";
       setDiscountPercentInput(pct.endsWith(".0") ? pct.slice(0, -2) : pct);
+      const newRem = Math.max(0, subtotal - disc - paidAmount);
+      setPaymentAmount(newRem > 0 ? newRem.toString() : "");
 
       try {
         const res = await fetch(`/api/orders/${currentOrder.id}/discount`, {
@@ -174,6 +182,8 @@ export function LiveBillModal({
       } catch {}
     } else if (val === "") {
       setDiscountPercentInput("");
+      const newRem = Math.max(0, subtotal - paidAmount);
+      setPaymentAmount(newRem > 0 ? newRem.toString() : "");
       try {
         const res = await fetch(`/api/orders/${currentOrder.id}/discount`, {
           method: "POST",

@@ -934,3 +934,51 @@ export async function getDiningOrderHistory(filter: OrderHistoryFilter = {}) {
   };
 }
 
+export async function deleteDiningOrder(
+  orderId: string,
+  user: { id: string; name: string; role: string }
+) {
+  const order = await prisma.diningOrder.findUnique({
+    where: { id: orderId },
+    include: { table: true },
+  });
+
+  if (!order) {
+    throw new Error("Order record not found");
+  }
+
+  // If order was currently active on the table, release the table back to AVAILABLE
+  if (order.status === "ACTIVE" && order.tableId) {
+    await prisma.diningTable.update({
+      where: { id: order.tableId },
+      data: { status: "AVAILABLE" },
+    });
+  }
+
+  // Delete associated items and payments
+  await prisma.diningPayment.deleteMany({ where: { orderId } });
+  await prisma.diningOrderItem.deleteMany({ where: { orderId } });
+  await prisma.diningOrder.delete({ where: { id: orderId } });
+
+  // Record exclusively in AuditLog as requested
+  await logAuditEvent({
+    userId: user.id,
+    userName: user.name,
+    action: "ORDER_DELETED",
+    entity: "DiningOrder",
+    entityId: orderId,
+    metadata: {
+      orderNumber: order.orderNumber,
+      orderCode: order.orderNumber ? `2026-${String(order.orderNumber).padStart(2, "0")}` : "2026-01",
+      tableName: order.table?.name || "Unknown Table",
+      customerName: order.customerName || "Walk-in Guest",
+      totalAmount: order.totalAmount,
+      deletedBy: user.name,
+      deletedByRole: user.role,
+    },
+  });
+
+  return { success: true };
+}
+
+

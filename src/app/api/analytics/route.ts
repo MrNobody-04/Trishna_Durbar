@@ -10,7 +10,9 @@ export async function GET(req: NextRequest) {
     const period = (searchParams.get("period") as TimePeriod) || "today";
 
     const metrics = await getDashboardMetrics(period);
-    return NextResponse.json({ metrics });
+    const response = NextResponse.json({ metrics });
+    response.headers.set("Cache-Control", "private, no-cache, no-store, must-revalidate");
+    return response;
   } catch (error: any) {
     return NextResponse.json(
       { error: error?.message || "Failed to fetch analytics" },

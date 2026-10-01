@@ -111,11 +111,11 @@ export function Navbar() {
   };
 
   const navItems = [
-    { href: "/", label: "Floor POS Matrix", icon: LayoutGrid },
+    { href: "/", label: "Order", icon: LayoutGrid },
     { href: "/orders", label: "Order History", icon: ClipboardList },
     { href: "/menu", label: "Menu & Bar Catalog", icon: BookOpen },
     { href: "/expenses", label: "Expenses & Outflows", icon: Receipt },
-    { href: "/analytics", label: "Analytics & P&L", icon: BarChart3 },
+    { href: "/analytics", label: "Analytics", icon: BarChart3 },
     { href: "/payment-qr", label: "Payment QR", icon: QrCode },
     { href: "/audit-logs", label: "Audit Trail", icon: ShieldCheck },
   ];

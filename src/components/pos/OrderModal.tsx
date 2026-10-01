@@ -144,31 +144,32 @@ export function OrderModal({
           .catch(() => {});
       }
 
-      if (table) {
-        setSelectedTable(table);
-        setSelectedFloor(table.floor);
-        setGuestCount(table.capacity || 2);
-      } else if (allTables.length > 0) {
-        setSelectedTable(allTables[0]);
-        setSelectedFloor(allTables[0].floor);
-        setGuestCount(allTables[0].capacity || 2);
-      }
-
       if (justOpened) {
+        if (table) {
+          setSelectedTable(table);
+          setSelectedFloor(table.floor);
+          setGuestCount(table.capacity || 2);
+        } else if (allTables.length > 0) {
+          setSelectedTable(allTables[0]);
+          setSelectedFloor(allTables[0].floor);
+          setGuestCount(allTables[0].capacity || 2);
+        }
         setBasket([]);
         setCustomerName("");
         setCustomerPhone("");
         setOrderNotes("");
         setMobileTab("MENU");
         setShowTablePicker(false);
+      } else if (table && table.id !== prevTableIdRef.current) {
+        setSelectedTable(table);
+        setSelectedFloor(table.floor);
+        setGuestCount(table.capacity || 2);
       }
     }
 
     prevIsOpenRef.current = isOpen;
     prevTableIdRef.current = table ? table.id : null;
   }, [isOpen, table?.id]);
-
-  if (!isOpen) return null;
 
   const floorTables = allTables.filter((t) => t.floor === selectedFloor);
   const activeTargetTable = selectedTable || table || (allTables.length > 0 ? allTables[0] : null);
@@ -353,6 +354,8 @@ export function OrderModal({
       setSubmitting(false);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-3 md:p-5 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">

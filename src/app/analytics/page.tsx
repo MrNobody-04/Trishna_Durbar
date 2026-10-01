@@ -44,10 +44,11 @@ export default function AnalyticsPage() {
   const [period, setPeriod] = useState<TimePeriod>("today");
   const [loading, setLoading] = useState(true);
 
-  const fetchMetrics = async () => {
-    setLoading(true);
+  const fetchMetrics = async (targetPeriod: TimePeriod = period) => {
+    // Only show full loading spinner on initial mount; smoothly update without flashing blank on period change
+    if (!metrics) setLoading(true);
     try {
-      const res = await fetch(`/api/analytics?period=${period}`);
+      const res = await fetch(`/api/analytics?period=${targetPeriod}`);
       if (!res.ok) throw new Error("Failed to load metrics");
       const data = await res.json();
       if (data?.metrics) setMetrics(data.metrics);
@@ -60,7 +61,7 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     setMounted(true);
-    fetchMetrics();
+    fetchMetrics(period);
   }, [period]);
 
   const comparisonData = metrics
@@ -92,10 +93,9 @@ export default function AnalyticsPage() {
             <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/30">
               Financial Intelligence & KPIs
             </span>
-            <span className="text-xs text-slate-400">• Real-Time Analytics</span>
           </div>
           <h1 className="text-2xl font-black text-amber-200 mt-2">
-            Trishna Durbar Business Performance
+            Analytics
           </h1>
           <p className="text-xs text-slate-400 mt-1">
             Real-time sales revenue, operational expenses, net profit, occupancy, and top-selling food items.

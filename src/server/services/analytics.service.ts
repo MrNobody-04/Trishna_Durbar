@@ -4,47 +4,70 @@ import { getNepalDateRange, TimePeriod } from "@/lib/utils";
 export async function getDashboardMetrics(period: TimePeriod = "today") {
   const range = getNepalDateRange(period);
 
-  // 1. Orders within period
-  const orders = await prisma.diningOrder.findMany({
-    where: {
-      status: "COMPLETED",
-      settledAt: {
-        gte: range.start,
-        lte: range.end,
+  // Run all 3 database queries concurrently in parallel with lean field selections
+  const [orders, expenses, allTables] = await Promise.all([
+    // 1. Orders within period
+    prisma.diningOrder.findMany({
+      where: {
+        status: "COMPLETED",
+        settledAt: {
+          gte: range.start,
+          lte: range.end,
+        },
       },
-    },
-    include: {
-      items: true,
-      table: true,
-    },
-  });
+      select: {
+        id: true,
+        paidAmount: true,
+        guestCount: true,
+        table: {
+          select: { floor: true },
+        },
+        items: {
+          select: {
+            name: true,
+            category: true,
+            quantity: true,
+            total: true,
+          },
+        },
+      },
+    }),
+
+    // 2. Expenses within period
+    prisma.expense.findMany({
+      where: {
+        date: {
+          gte: range.start,
+          lte: range.end,
+        },
+      },
+      select: {
+        amount: true,
+      },
+    }),
+
+    // 3. Current Live Status of tables
+    prisma.diningTable.findMany({
+      select: {
+        id: true,
+        status: true,
+        orders: {
+          where: { status: "ACTIVE" },
+          select: {
+            guestCount: true,
+            totalAmount: true,
+          },
+        },
+      },
+    }),
+  ]);
 
   const totalRevenue = orders.reduce((sum, o) => sum + o.paidAmount, 0);
   const totalOrders = orders.length;
   const totalGuests = orders.reduce((sum, o) => sum + o.guestCount, 0);
 
-  // 2. Expenses within period
-  const expenses = await prisma.expense.findMany({
-    where: {
-      date: {
-        gte: range.start,
-        lte: range.end,
-      },
-    },
-  });
-
   const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
   const netProfit = totalRevenue - totalExpense;
-
-  // 3. Current Live Status of all 9 tables
-  const allTables = await prisma.diningTable.findMany({
-    include: {
-      orders: {
-        where: { status: "ACTIVE" },
-        include: { items: true },
-      },
-    },
-  });
 
   const totalTables = allTables.length;
   const occupiedTables = allTables.filter((t) => t.status === "OCCUPIED").length;

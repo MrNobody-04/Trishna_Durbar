@@ -1,0 +1,76 @@
+import prisma from "@/lib/db";
+import { logAuditEvent } from "./audit.service";
+
+export interface CreatePaymentQrInput {
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+  qrImageUrl: string;
+  notes?: string | null;
+  isDefault?: boolean;
+}
+
+export async function getActivePaymentQrs() {
+  return await prisma.paymentQr.findMany({
+    where: { isActive: true },
+    orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
+  });
+}
+
+export async function getDefaultPaymentQr() {
+  return await prisma.paymentQr.findFirst({
+    where: { isActive: true, isDefault: true },
+  });
+}
+
+export async function createPaymentQr(
+  input: CreatePaymentQrInput,
+  userId: string,
+  userName: string
+) {
+  if (input.isDefault) {
+    await prisma.paymentQr.updateMany({
+      where: { isDefault: true },
+      data: { isDefault: false },
+    });
+  }
+
+  const qr = await prisma.paymentQr.create({
+    data: {
+      bankName: input.bankName,
+      accountName: input.accountName,
+      accountNumber: input.accountNumber,
+      qrImageUrl: input.qrImageUrl,
+      notes: input.notes || null,
+      isDefault: input.isDefault ?? false,
+      isActive: true,
+    },
+  });
+
+  await logAuditEvent({
+    userId,
+    userName,
+    action: "CREATE_PAYMENT_QR",
+    entity: "PaymentQr",
+    entityId: qr.id,
+    metadata: { bankName: qr.bankName, accountName: qr.accountName },
+  });
+
+  return qr;
+}
+
+export async function deletePaymentQr(
+  id: string,
+  userId: string,
+  userName: string
+) {
+  await prisma.paymentQr.delete({ where: { id } });
+  await logAuditEvent({
+    userId,
+    userName,
+    action: "DELETE_PAYMENT_QR",
+    entity: "PaymentQr",
+    entityId: id,
+  });
+  return { success: true };
+}

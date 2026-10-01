@@ -1,0 +1,170 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         String    @default("MANAGER")
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  expenses     Expense[]  @relation("ExpenseCreatedBy")
+  auditLogs    AuditLog[] @relation("UserAuditLogs")
+
+  @@index([email])
+}
+
+model DiningTable {
+  id        String        @id @default(cuid())
+  name      String        @unique
+  floor     String        @default("HALL")
+  status    String        @default("AVAILABLE")
+  capacity  Int           @default(4)
+  notes     String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  orders    DiningOrder[]
+
+  @@index([name])
+  @@index([floor])
+  @@index([status])
+}
+
+model MenuItem {
+  id          String   @id @default(cuid())
+  nameNepali  String
+  nameEnglish String
+  category    String
+  portion     String   @default("REGULAR")
+  price       Float
+  description String?
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([isAvailable])
+}
+
+model DiningOrder {
+  id            String            @id @default(cuid())
+  tableId       String
+  table         DiningTable       @relation(fields: [tableId], references: [id])
+  customerName  String?
+  customerPhone String?
+  guestCount    Int               @default(1)
+  status        String            @default("ACTIVE")
+  subtotal      Float             @default(0)
+  discount      Float             @default(0)
+  totalAmount   Float             @default(0)
+  paidAmount    Float             @default(0)
+  paymentMethod String?
+  notes         String?
+  kotPrinted    Boolean           @default(false)
+  createdById   String?
+  createdByName String?
+  settledAt     DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  items         DiningOrderItem[]
+  payments      DiningPayment[]
+
+  @@index([tableId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([settledAt])
+}
+
+model DiningOrderItem {
+  id        String      @id @default(cuid())
+  orderId   String
+  order     DiningOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  category  String      @default("FOOD")
+  name      String
+  portion   String?     @default("REGULAR")
+  quantity  Int         @default(1)
+  unitPrice Float
+  total     Float
+  notes     String?
+  createdAt DateTime    @default(now())
+
+  @@index([orderId])
+}
+
+model DiningPayment {
+  id             String      @id @default(cuid())
+  orderId        String
+  order          DiningOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  amount         Float
+  method         String      @default("CASH")
+  tendered       Float?
+  changeReturn   Float?
+  notes          String?
+  recordedByName String?
+  timestamp      DateTime    @default(now())
+
+  @@index([orderId])
+  @@index([timestamp])
+}
+
+model Expense {
+  id            String   @id @default(cuid())
+  title         String
+  amount        Float
+  category      String   @default("OTHER")
+  date          DateTime @default(now())
+  paymentMethod String   @default("CASH")
+  notes         String?
+  receiptUrl    String?
+  createdById   String
+  createdBy     User     @relation("ExpenseCreatedBy", fields: [createdById], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([date])
+  @@index([category])
+}
+
+model PaymentQr {
+  id            String   @id @default(cuid())
+  bankName      String
+  accountName   String
+  accountNumber String
+  qrImageUrl    String
+  isDefault     Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isDefault])
+  @@index([isActive])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation("UserAuditLogs", fields: [userId], references: [id], onDelete: SetNull)
+  userName  String
+  action    String
+  entity    String
+  entityId  String?
+  metadata  String?
+  ipAddress String?
+  timestamp DateTime @default(now())
+
+  @@index([timestamp])
+  @@index([action])
+  @@index([entity])
+}

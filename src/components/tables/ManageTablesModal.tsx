@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { DiningTableData, FloorArea } from "@/types";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface ManageTablesModalProps {
   isOpen: boolean;
@@ -52,6 +53,7 @@ export function ManageTablesModal({
   const [editingFloor, setEditingFloor] = useState<FloorArea>("GROUND");
   const [editingCapacity, setEditingCapacity] = useState("4");
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [tableToDelete, setTableToDelete] = useState<DiningTableData | null>(null);
 
   const handleStartEdit = (t: DiningTableData) => {
     setEditingTableId(t.id);
@@ -138,7 +140,7 @@ export function ManageTablesModal({
     }
   };
 
-  const handleDeleteTable = async (table: DiningTableData) => {
+  const handleDeleteTable = (table: DiningTableData) => {
     if (table.status === "OCCUPIED" || table.activeOrder) {
       toast.error(
         `Cannot remove ${table.name} while an active order is in progress. Please settle or cancel the order first.`
@@ -146,24 +148,23 @@ export function ManageTablesModal({
       return;
     }
 
-    if (
-      !confirm(
-        `Are you sure you want to permanently remove ${table.name} from ${table.floor}?`
-      )
-    ) {
-      return;
-    }
+    setTableToDelete(table);
+  };
 
-    setDeletingId(table.id);
+  const executeDeleteTable = async () => {
+    if (!tableToDelete) return;
+
+    setDeletingId(tableToDelete.id);
     try {
-      const res = await fetch(`/api/tables/${table.id}`, {
+      const res = await fetch(`/api/tables/${tableToDelete.id}`, {
         method: "DELETE",
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to delete table");
 
-      toast.success(`${table.name} removed successfully!`);
+      toast.success(`${tableToDelete.name} removed successfully!`);
+      setTableToDelete(null);
       onRefresh();
     } catch (err: any) {
       toast.error(err.message || "Failed to delete table");
@@ -492,6 +493,19 @@ export function ManageTablesModal({
           </button>
         </div>
       </div>
+
+      {/* In-App Standard Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={!!tableToDelete}
+        title="Remove Dining Table?"
+        message={`Are you sure you want to permanently remove ${tableToDelete?.name} from ${tableToDelete?.floor}?`}
+        confirmLabel="Yes, Remove"
+        cancelLabel="No, Keep"
+        variant="danger"
+        isLoading={!!deletingId}
+        onConfirm={executeDeleteTable}
+        onCancel={() => setTableToDelete(null)}
+      />
     </div>
   );
 }

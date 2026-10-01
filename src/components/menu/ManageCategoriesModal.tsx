@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { X, Tag, Plus, Trash2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface Category {
   id: string;
@@ -31,6 +32,7 @@ export function ManageCategoriesModal({
   const [categoryIcon, setCategoryIcon] = useState("🍽️");
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
 
   if (!isOpen) return null;
 
@@ -69,25 +71,24 @@ export function ManageCategoriesModal({
     }
   };
 
-  const handleDeleteCategory = async (cat: Category) => {
-    if (
-      !confirm(
-        `Are you sure you want to delete category "${cat.label}"? Existing items in this category won't be deleted but will appear under All Dishes.`
-      )
-    ) {
-      return;
-    }
+  const handleDeleteCategory = (cat: Category) => {
+    setCategoryToDelete(cat);
+  };
 
-    setDeletingId(cat.id);
+  const executeDeleteCategory = async () => {
+    if (!categoryToDelete) return;
+
+    setDeletingId(categoryToDelete.id);
     try {
-      const res = await fetch(`/api/categories/${cat.id}`, {
+      const res = await fetch(`/api/categories/${categoryToDelete.id}`, {
         method: "DELETE",
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to delete category");
 
-      toast.success(`Category "${cat.label}" removed`);
+      toast.success(`Category "${categoryToDelete.label}" removed`);
+      setCategoryToDelete(null);
       onRefresh();
     } catch (err: any) {
       toast.error(err.message || "Failed to delete category");
@@ -249,6 +250,19 @@ export function ManageCategoriesModal({
           </button>
         </div>
       </div>
+
+      {/* In-App Standard Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={!!categoryToDelete}
+        title="Delete Menu Category?"
+        message={`Are you sure you want to delete category "${categoryToDelete?.label}"? Existing dishes in this category will not be deleted but will appear under All Dishes.`}
+        confirmLabel="Yes, Delete"
+        cancelLabel="No, Keep"
+        variant="danger"
+        isLoading={!!deletingId}
+        onConfirm={executeDeleteCategory}
+        onCancel={() => setCategoryToDelete(null)}
+      />
     </div>
   );
 }

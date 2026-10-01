@@ -70,6 +70,7 @@ model MenuItem {
 
 model DiningOrder {
   id              String            @id @default(cuid())
+  orderNumber     Int?
   tableId         String
   table           DiningTable       @relation(fields: [tableId], references: [id])
   customerName    String?

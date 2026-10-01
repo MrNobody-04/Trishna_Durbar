@@ -6,7 +6,14 @@ export async function GET() {
   try {
     await requireAuth();
     const categories = await getCategories();
-    return NextResponse.json({ categories });
+    return NextResponse.json(
+      { categories },
+      {
+        headers: {
+          "Cache-Control": "private, max-age=30, stale-while-revalidate=120",
+        },
+      }
+    );
   } catch (error: any) {
     return NextResponse.json(
       { error: error?.message || "Failed to fetch categories" },

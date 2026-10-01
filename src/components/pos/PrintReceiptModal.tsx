@@ -3,7 +3,7 @@
 import React, { useRef } from "react";
 import { X, Printer, Crown } from "lucide-react";
 import { DiningTableData } from "@/types";
-import { formatNpr, formatNepalDateTime } from "@/lib/utils";
+import { formatNpr, formatNepalDateTime, formatOrderNumber } from "@/lib/utils";
 
 interface PrintReceiptModalProps {
   isOpen: boolean;
@@ -79,7 +79,7 @@ export function PrintReceiptModal({
                 <span>FLOOR: <strong>{table.floor}</strong></span>
               </div>
               <div className="flex justify-between">
-                <span>ORDER: #{order.id.slice(-6).toUpperCase()}</span>
+                <span>ORDER: #{formatOrderNumber(order)}</span>
                 <span>DINERS: {order.guestCount}</span>
               </div>
               <div>GUEST: {order.customerName}</div>
@@ -155,13 +155,20 @@ export function PrintReceiptModal({
             )}
 
             {/* Footer */}
-            <div className="pt-3 text-center text-[9px] text-gray-600 space-y-1">
-              <p className="font-bold">Thank you for dining with us!</p>
-              <p>Trishna Durbar Restaurant & Bar</p>
-              <p className="text-[8px] font-semibold text-gray-500 pt-1 border-t border-gray-200">
-                System Developed by SUJANGC
-              </p>
-            </div>
+            {mode === "BILL" ? (
+              <div className="pt-3 text-center text-[9px] text-gray-600 space-y-1">
+                <p className="font-bold">Thank you for dining with us!</p>
+                <p>Trishna Durbar Restaurant & Bar</p>
+                <p className="text-[8px] font-semibold text-gray-500 pt-1 border-t border-gray-200">
+                  System Developed by SUJANGC
+                </p>
+              </div>
+            ) : (
+              <div className="pt-2 text-center text-[9px] text-gray-600 border-t border-dashed border-gray-400">
+                <p className="font-bold tracking-wider">*** KITCHEN ORDER TICKET (KOT) ***</p>
+                <p className="text-[8px] text-gray-500">Trishna Durbar Kitchen Counter</p>
+              </div>
+            )}
           </div>
         </div>
 

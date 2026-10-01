@@ -14,7 +14,14 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get("search") || undefined;
 
     const items = await getMenuItems(category, search);
-    return NextResponse.json({ items });
+    return NextResponse.json(
+      { items },
+      {
+        headers: {
+          "Cache-Control": "private, max-age=15, stale-while-revalidate=60",
+        },
+      }
+    );
   } catch (error: any) {
     return NextResponse.json(
       { error: error?.message || "Failed to fetch menu" },

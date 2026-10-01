@@ -59,6 +59,52 @@ export async function createPaymentQr(
   return qr;
 }
 
+export interface UpdatePaymentQrInput {
+  bankName?: string;
+  accountName?: string;
+  accountNumber?: string;
+  qrImageUrl?: string;
+  notes?: string | null;
+  isDefault?: boolean;
+}
+
+export async function updatePaymentQr(
+  id: string,
+  input: UpdatePaymentQrInput,
+  userId: string,
+  userName: string
+) {
+  if (input.isDefault) {
+    await prisma.paymentQr.updateMany({
+      where: { isDefault: true, NOT: { id } },
+      data: { isDefault: false },
+    });
+  }
+
+  const updated = await prisma.paymentQr.update({
+    where: { id },
+    data: {
+      ...(input.bankName && { bankName: input.bankName }),
+      ...(input.accountName && { accountName: input.accountName }),
+      ...(input.accountNumber !== undefined && { accountNumber: input.accountNumber }),
+      ...(input.qrImageUrl && { qrImageUrl: input.qrImageUrl }),
+      ...(input.notes !== undefined && { notes: input.notes }),
+      ...(input.isDefault !== undefined && { isDefault: input.isDefault }),
+    },
+  });
+
+  await logAuditEvent({
+    userId,
+    userName,
+    action: "UPDATE_PAYMENT_QR",
+    entity: "PaymentQr",
+    entityId: id,
+    metadata: { bankName: updated.bankName, accountName: updated.accountName },
+  });
+
+  return updated;
+}
+
 export async function deletePaymentQr(
   id: string,
   userId: string,
@@ -74,3 +120,4 @@ export async function deletePaymentQr(
   });
   return { success: true };
 }
+

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { formatNpr, formatNepalDateTime, TimePeriod } from "@/lib/utils";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface ExpenseRecord {
   id: string;
@@ -57,6 +58,8 @@ export default function ExpensesPage() {
   const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchExpenses = async () => {
     setLoading(true);
@@ -120,19 +123,27 @@ export default function ExpensesPage() {
     }
   };
 
-  const handleDeleteExpense = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this expense record?")) return;
+  const handleDeleteExpense = (id: string) => {
+    setExpenseToDelete(id);
+  };
+
+  const executeDeleteExpense = async () => {
+    if (!expenseToDelete) return;
+    setIsDeleting(true);
 
     try {
-      const res = await fetch(`/api/expenses/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/expenses/${expenseToDelete}`, { method: "DELETE" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to delete expense");
 
       toast.success("Expense record removed");
-      setExpenses((prev) => prev.filter((e) => e.id !== id));
+      setExpenses((prev) => prev.filter((e) => e.id !== expenseToDelete));
+      setExpenseToDelete(null);
       fetchExpenses();
     } catch (err: any) {
       toast.error(err.message || "Failed to delete");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -405,6 +416,19 @@ export default function ExpensesPage() {
           </div>
         </div>
       )}
+
+      {/* In-App Standard Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={!!expenseToDelete}
+        title="Delete Expense Record?"
+        message="Are you sure you want to delete this expense record? This will adjust your total restaurant expenditure totals."
+        confirmLabel="Yes, Delete"
+        cancelLabel="No, Keep"
+        variant="danger"
+        isLoading={isDeleting}
+        onConfirm={executeDeleteExpense}
+        onCancel={() => setExpenseToDelete(null)}
+      />
     </div>
   );
 }

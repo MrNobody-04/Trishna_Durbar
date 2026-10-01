@@ -17,6 +17,7 @@ import {
   Menu as MenuIcon,
   X,
   Sparkles,
+  ClipboardList,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
@@ -111,6 +112,7 @@ export function Navbar() {
 
   const navItems = [
     { href: "/", label: "Floor POS Matrix", icon: LayoutGrid },
+    { href: "/orders", label: "Order History", icon: ClipboardList },
     { href: "/menu", label: "Menu & Bar Catalog", icon: BookOpen },
     { href: "/expenses", label: "Expenses & Outflows", icon: Receipt },
     { href: "/analytics", label: "Analytics & P&L", icon: BarChart3 },

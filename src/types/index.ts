@@ -51,6 +51,7 @@ export interface DiningTableData {
 
 export interface ActiveOrderData {
   id: string;
+  orderNumber?: number | null;
   customerName?: string | null;
   customerPhone?: string | null;
   guestCount: number;

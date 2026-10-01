@@ -22,6 +22,7 @@ import {
 import { DiningTableData, ActiveOrderData } from "@/types";
 import { formatNpr, formatNepalDateTime } from "@/lib/utils";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface LiveBillModalProps {
   isOpen: boolean;
@@ -55,6 +56,7 @@ export function LiveBillModal({
   const [submittingPayment, setSubmittingPayment] = useState(false);
   const [settling, setSettling] = useState(false);
   const [cancellingBill, setCancellingBill] = useState(false);
+  const [showVoidConfirm, setShowVoidConfirm] = useState(false);
 
   // Discount Inputs
   const [discountPercentInput, setDiscountPercentInput] = useState<string>("");
@@ -281,11 +283,6 @@ export function LiveBillModal({
 
   // 6b. VOID / CANCEL ENTIRE BILL (Frees table, records in history, zero revenue impact)
   const handleVoidBill = async () => {
-    const confirmed = window.confirm(
-      `Are you sure you want to cancel and delete this entire bill for ${table?.name}?\n\n• The table will be immediately cleared and marked available.\n• The bill will remain in history & audit trail as CANCELLED.\n• The amount will NOT be counted in revenue or sales.`
-    );
-    if (!confirmed) return;
-
     setCancellingBill(true);
     try {
       const res = await fetch(`/api/orders/${currentOrder.id}/cancel`, {
@@ -297,6 +294,7 @@ export function LiveBillModal({
       if (!res.ok) throw new Error(data.error || "Failed to cancel bill");
 
       toast.success(`Bill for ${table?.name} cancelled and table cleared!`);
+      setShowVoidConfirm(false);
       onRefresh();
       onClose();
     } catch (err: any) {
@@ -794,7 +792,7 @@ export function LiveBillModal({
               <button
                 type="button"
                 disabled={cancellingBill}
-                onClick={handleVoidBill}
+                onClick={() => setShowVoidConfirm(true)}
                 className="w-full py-2.5 rounded-xl text-xs font-bold text-red-600 dark:text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 transition-all flex items-center justify-center gap-1.5"
               >
                 <Trash2 className="h-3.5 w-3.5" />
@@ -805,6 +803,19 @@ export function LiveBillModal({
           </div>
         </div>
       </div>
+
+      {/* In-App Standard Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showVoidConfirm}
+        title="Cancel & Void Entire Bill?"
+        message={`Do you want to cancel and void the bill for ${table.name}? The table will be immediately released, and this bill will be marked as CANCELLED with no revenue recorded.`}
+        confirmLabel="Yes, Void Bill"
+        cancelLabel="No, Keep Bill"
+        variant="danger"
+        isLoading={cancellingBill}
+        onConfirm={handleVoidBill}
+        onCancel={() => setShowVoidConfirm(false)}
+      />
     </div>
   );
 }

@@ -72,6 +72,11 @@ const getCategoryEmoji = (category: string) => {
   return "🍽️";
 };
 
+// Module-level caches for instantaneous 0ms ordering experience
+let cachedMenuItems: MenuItemRecord[] = [];
+let cachedCategories: CategoryRecord[] = [];
+let lastMenuFetchTime = 0;
+
 export function OrderModal({
   isOpen,
   onClose,
@@ -80,8 +85,8 @@ export function OrderModal({
   onOrderSuccess,
   mode,
 }: OrderModalProps) {
-  const [menuItems, setMenuItems] = useState<MenuItemRecord[]>([]);
-  const [categories, setCategories] = useState<CategoryRecord[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItemRecord[]>(() => cachedMenuItems);
+  const [categories, setCategories] = useState<CategoryRecord[]>(() => cachedCategories);
   const [selectedFloor, setSelectedFloor] = useState<FloorArea>("HALL");
   const [selectedTable, setSelectedTable] = useState<DiningTableData | null>(table);
   const [showTablePicker, setShowTablePicker] = useState(false);
@@ -106,20 +111,38 @@ export function OrderModal({
     const tableExplicitlyChanged = isOpen && table && table.id !== prevTableIdRef.current;
 
     if (justOpened || tableExplicitlyChanged) {
-      // Fetch fresh menu and categories
-      fetch("/api/menu")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data?.items) setMenuItems(data.items);
-        })
-        .catch(() => toast.error("Failed to load menu items"));
+      // Instantly load from cache if available
+      if (cachedMenuItems.length > 0) {
+        setMenuItems(cachedMenuItems);
+      }
+      if (cachedCategories.length > 0) {
+        setCategories(cachedCategories);
+      }
 
-      fetch("/api/categories")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data?.categories) setCategories(data.categories);
-        })
-        .catch(() => {});
+      // Fetch fresh menu if cache is empty or stale (> 30s)
+      const isStale = Date.now() - lastMenuFetchTime > 30000;
+      if (cachedMenuItems.length === 0 || isStale) {
+        fetch("/api/menu")
+          .then((res) => res.json())
+          .then((data) => {
+            if (data?.items) {
+              cachedMenuItems = data.items;
+              lastMenuFetchTime = Date.now();
+              setMenuItems(data.items);
+            }
+          })
+          .catch(() => toast.error("Failed to load menu items"));
+
+        fetch("/api/categories")
+          .then((res) => res.json())
+          .then((data) => {
+            if (data?.categories) {
+              cachedCategories = data.categories;
+              setCategories(data.categories);
+            }
+          })
+          .catch(() => {});
+      }
 
       if (table) {
         setSelectedTable(table);
@@ -143,52 +166,68 @@ export function OrderModal({
 
     prevIsOpenRef.current = isOpen;
     prevTableIdRef.current = table ? table.id : null;
-  }, [isOpen, table?.id]); // Strictly dependent on isOpen and table.id, NEVER on allTables array reference!
+  }, [isOpen, table?.id]);
 
   if (!isOpen) return null;
 
   const floorTables = allTables.filter((t) => t.floor === selectedFloor);
   const activeTargetTable = selectedTable || table || (allTables.length > 0 ? allTables[0] : null);
 
-  const filteredItems = menuItems.filter((item) => {
-    if (!item.isAvailable) return false;
-    const matchesCategory =
-      selectedCategory === "ALL" || item.category === selectedCategory;
+  const filteredItems = React.useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    const matchesSearch =
-      !q ||
-      item.nameEnglish.toLowerCase().includes(q) ||
-      item.nameNepali.toLowerCase().includes(q);
-    return matchesCategory && matchesSearch;
-  });
+    return menuItems.filter((item) => {
+      if (!item.isAvailable) return false;
+      const matchesCategory =
+        selectedCategory === "ALL" || item.category === selectedCategory;
+      const matchesSearch =
+        !q ||
+        item.nameEnglish.toLowerCase().includes(q) ||
+        item.nameNepali.toLowerCase().includes(q);
+      return matchesCategory && matchesSearch;
+    });
+  }, [menuItems, selectedCategory, searchQuery]);
 
   const getItemDisplayName = (item: MenuItemRecord) => {
     return item.nameNepali ? `${item.nameNepali} (${item.nameEnglish})` : item.nameEnglish;
   };
 
+  // O(1) instantaneous lookup map for dish quantities in the basket
+  const basketQtyMap = React.useMemo(() => {
+    const map = new Map<string, number>();
+    for (const b of basket) {
+      map.set(`${b.name}_${b.unitPrice}`, b.quantity);
+    }
+    return map;
+  }, [basket]);
+
   const getItemQuantityInBasket = (item: MenuItemRecord) => {
     const displayName = getItemDisplayName(item);
-    const found = basket.find(
-      (b) => (b.name === displayName || b.name === item.nameEnglish) && b.unitPrice === item.price
+    return (
+      basketQtyMap.get(`${displayName}_${item.price}`) ||
+      basketQtyMap.get(`${item.nameEnglish}_${item.price}`) ||
+      0
     );
-    return found ? found.quantity : 0;
   };
 
   const addItemToBasket = (item: MenuItemRecord) => {
     const displayName = getItemDisplayName(item);
-    const existingIndex = basket.findIndex(
-      (b) => (b.name === displayName || b.name === item.nameEnglish) && b.unitPrice === item.price
-    );
+    setBasket((prev) => {
+      const existingIndex = prev.findIndex(
+        (b) => (b.name === displayName || b.name === item.nameEnglish) && b.unitPrice === item.price
+      );
 
-    if (existingIndex > -1) {
-      const updated = [...basket];
-      updated[existingIndex].quantity += 1;
-      updated[existingIndex].total =
-        updated[existingIndex].quantity * updated[existingIndex].unitPrice;
-      setBasket(updated);
-    } else {
-      setBasket([
-        ...basket,
+      if (existingIndex > -1) {
+        const updated = [...prev];
+        const newQty = updated[existingIndex].quantity + 1;
+        updated[existingIndex] = {
+          ...updated[existingIndex],
+          quantity: newQty,
+          total: newQty * updated[existingIndex].unitPrice,
+        };
+        return updated;
+      }
+      return [
+        ...prev,
         {
           name: displayName,
           category: item.category,
@@ -198,28 +237,30 @@ export function OrderModal({
           total: item.price,
           notes: "",
         },
-      ]);
-    }
+      ];
+    });
   };
 
   const decrementItemInBasket = (item: MenuItemRecord) => {
     const displayName = getItemDisplayName(item);
-    const existingIndex = basket.findIndex(
-      (b) => (b.name === displayName || b.name === item.nameEnglish) && b.unitPrice === item.price
-    );
+    setBasket((prev) => {
+      const existingIndex = prev.findIndex(
+        (b) => (b.name === displayName || b.name === item.nameEnglish) && b.unitPrice === item.price
+      );
 
-    if (existingIndex > -1) {
-      const updated = [...basket];
-      if (updated[existingIndex].quantity > 1) {
-        updated[existingIndex].quantity -= 1;
-        updated[existingIndex].total =
-          updated[existingIndex].quantity * updated[existingIndex].unitPrice;
-        setBasket(updated);
-      } else {
-        updated.splice(existingIndex, 1);
-        setBasket(updated);
+      if (existingIndex === -1) return prev;
+      if (prev[existingIndex].quantity > 1) {
+        const updated = [...prev];
+        const newQty = updated[existingIndex].quantity - 1;
+        updated[existingIndex] = {
+          ...updated[existingIndex],
+          quantity: newQty,
+          total: newQty * updated[existingIndex].unitPrice,
+        };
+        return updated;
       }
-    }
+      return prev.filter((_, i) => i !== existingIndex);
+    });
   };
 
   const updateQuantity = (index: number, delta: number) => {
@@ -253,7 +294,10 @@ export function OrderModal({
     setBasket(updated);
   };
 
-  const basketSubtotal = basket.reduce((acc, curr) => acc + curr.total, 0);
+  const basketSubtotal = React.useMemo(
+    () => basket.reduce((acc, curr) => acc + curr.total, 0),
+    [basket]
+  );
 
   const handleSubmit = async () => {
     const currentTable = activeTargetTable;

@@ -19,6 +19,7 @@ import {
   ArrowUpRight,
   ShieldCheck,
   CheckCircle2,
+  ClipboardList,
 } from "lucide-react";
 import {
   BarChart,
@@ -112,12 +113,14 @@ export default function DashboardLandingPage() {
     return () => clearInterval(interval);
   }, [orderModalOpen, billModalOpen, printModalOpen, qrModalOpen, manageTablesModalOpen]);
 
-  const filteredTables = tables.filter((t) => {
-    if (selectedFloor === "ALL") return true;
-    return t.floor === selectedFloor;
-  });
+  const filteredTables = React.useMemo(() => {
+    if (selectedFloor === "ALL") return tables;
+    return tables.filter((t) => t.floor === selectedFloor);
+  }, [tables, selectedFloor]);
 
-  const activeTablesList = tables.filter((t) => t.status === "OCCUPIED" && t.activeOrder);
+  const activeTablesList = React.useMemo(() => {
+    return tables.filter((t) => t.status === "OCCUPIED" && t.activeOrder);
+  }, [tables]);
 
   const comparisonData = metrics
     ? [
@@ -155,6 +158,14 @@ export default function DashboardLandingPage() {
               <PlusCircle className="h-4 w-4 stroke-[2.5]" />
               <span>Take Order</span>
             </button>
+
+            <Link
+              href="/orders"
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-secondary/80 hover:bg-secondary border border-border hover:border-amber-500/50 text-xs font-bold text-foreground transition-all shadow-xs active:scale-[0.98]"
+            >
+              <ClipboardList className="h-4 w-4 text-amber-500" />
+              <span>Order History</span>
+            </Link>
 
             <button
               type="button"

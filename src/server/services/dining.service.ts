@@ -62,6 +62,7 @@ export async function getDiningTables(floorFilter?: FloorArea | string) {
       activeOrder: activeOrder
         ? {
             id: activeOrder.id,
+            orderNumber: activeOrder.orderNumber,
             customerName: activeOrder.customerName || "Walk-in Guest",
             customerPhone: activeOrder.customerPhone,
             guestCount: activeOrder.guestCount,
@@ -116,7 +117,7 @@ export async function getDiningOrderById(orderId: string) {
 }
 
 export async function startDiningOrder(input: StartDiningOrderInput) {
-  return await prisma.$transaction(async (tx) => {
+  const { order, table, totalAmount, itemsCount } = await prisma.$transaction(async (tx) => {
     const table = await tx.diningTable.findUnique({
       where: { id: input.tableId },
     });
@@ -137,9 +138,20 @@ export async function startDiningOrder(input: StartDiningOrderInput) {
     const subtotal = items.reduce((acc, it) => acc + it.quantity * it.unitPrice, 0);
     const totalAmount = subtotal;
 
+    // Sequence order number per year (e.g. 1, 2, 3...)
+    const currentYear = new Date().getFullYear();
+    const yearStart = new Date(currentYear, 0, 1);
+    const lastOrderThisYear = await tx.diningOrder.findFirst({
+      where: { createdAt: { gte: yearStart } },
+      orderBy: { orderNumber: "desc" },
+      select: { orderNumber: true },
+    });
+    const nextOrderNumber = (lastOrderThisYear?.orderNumber || 0) + 1;
+
     const order = await tx.diningOrder.create({
       data: {
         tableId: input.tableId,
+        orderNumber: nextOrderNumber,
         customerName: input.customerName || "Walk-in Guest",
         customerPhone: input.customerPhone || null,
         guestCount: input.guestCount || 1,
@@ -175,23 +187,27 @@ export async function startDiningOrder(input: StartDiningOrderInput) {
       data: { status: "OCCUPIED" },
     });
 
-    await logAuditEvent({
-      userId: input.userId,
-      userName: input.userName,
-      action: "START_DINING_ORDER",
-      entity: "DiningOrder",
-      entityId: order.id,
-      metadata: {
-        tableName: table.name,
-        customerName: order.customerName,
-        guestCount: order.guestCount,
-        initialItemCount: items.length,
-        initialTotal: totalAmount,
-      },
-    });
-
-    return order;
+    return { order, table, totalAmount, itemsCount: items.length };
   }, TX_OPTIONS);
+
+  // Decoupled asynchronous audit logging - zero blocking on response
+  logAuditEvent({
+    userId: input.userId,
+    userName: input.userName,
+    action: "START_DINING_ORDER",
+    entity: "DiningOrder",
+    entityId: order.id,
+    metadata: {
+      tableName: table.name,
+      orderNumber: order.orderNumber,
+      customerName: order.customerName,
+      guestCount: order.guestCount,
+      initialItemCount: itemsCount,
+      initialTotal: totalAmount,
+    },
+  }).catch(() => {});
+
+  return order;
 }
 
 export async function addItemsToDiningOrder(
@@ -200,7 +216,7 @@ export async function addItemsToDiningOrder(
   userId: string,
   userName: string
 ) {
-  return await prisma.$transaction(async (tx) => {
+  const { updated, tableName, newTotal } = await prisma.$transaction(async (tx) => {
     const order = await tx.diningOrder.findUnique({
       where: { id: orderId },
       include: { items: true, table: true },
@@ -210,9 +226,9 @@ export async function addItemsToDiningOrder(
       throw new Error("Active dining order not found");
     }
 
-    for (const it of items) {
-      await tx.diningOrderItem.create({
-        data: {
+    if (items.length > 0) {
+      await tx.diningOrderItem.createMany({
+        data: items.map((it) => ({
           orderId,
           name: it.name,
           category: it.category || "FOOD",
@@ -221,7 +237,7 @@ export async function addItemsToDiningOrder(
           unitPrice: it.unitPrice,
           total: it.quantity * it.unitPrice,
           notes: it.notes || null,
-        },
+        })),
       });
     }
 
@@ -246,21 +262,24 @@ export async function addItemsToDiningOrder(
       },
     });
 
-    await logAuditEvent({
-      userId,
-      userName,
-      action: "ADD_ITEMS_DINING_ORDER",
-      entity: "DiningOrder",
-      entityId: orderId,
-      metadata: {
-        tableName: order.table.name,
-        itemsAdded: items.length,
-        newTotal,
-      },
-    });
-
-    return updated;
+    return { updated, tableName: order.table.name, newTotal };
   }, TX_OPTIONS);
+
+  // Decoupled asynchronous audit logging
+  logAuditEvent({
+    userId,
+    userName,
+    action: "ADD_ITEMS_DINING_ORDER",
+    entity: "DiningOrder",
+    entityId: orderId,
+    metadata: {
+      tableName,
+      itemsAdded: items.length,
+      newTotal,
+    },
+  }).catch(() => {});
+
+  return updated;
 }
 
 export async function removeOrderItem(
@@ -831,3 +850,87 @@ export async function updateOrderPricing(
     return updated;
   }, TX_OPTIONS);
 }
+
+export interface OrderHistoryFilter {
+  status?: string;
+  search?: string;
+  limit?: number;
+  page?: number;
+  startDate?: string;
+  endDate?: string;
+}
+
+export async function getDiningOrderHistory(filter: OrderHistoryFilter = {}) {
+  const { status, search, limit = 50, page = 1, startDate, endDate } = filter;
+  const skip = (page - 1) * limit;
+
+  const where: any = {};
+
+  if (status && status !== "ALL") {
+    where.status = status;
+  }
+
+  if (startDate || endDate) {
+    where.createdAt = {};
+    if (startDate) where.createdAt.gte = new Date(startDate);
+    if (endDate) where.createdAt.lte = new Date(endDate);
+  }
+
+  if (search && search.trim()) {
+    const q = search.trim();
+    const isNum = !isNaN(Number(q));
+    where.OR = [
+      { customerName: { contains: q, mode: "insensitive" } },
+      { customerPhone: { contains: q, mode: "insensitive" } },
+      { table: { name: { contains: q, mode: "insensitive" } } },
+      { id: { contains: q, mode: "insensitive" } },
+      ...(isNum ? [{ orderNumber: Number(q) }] : []),
+    ];
+  }
+
+  const [orders, totalCount] = await Promise.all([
+    prisma.diningOrder.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+      include: {
+        table: true,
+        items: {
+          orderBy: { createdAt: "asc" },
+        },
+        payments: {
+          orderBy: { timestamp: "asc" },
+        },
+      },
+    }),
+    prisma.diningOrder.count({ where }),
+  ]);
+
+  // Aggregate summary stats
+  const summary = await prisma.diningOrder.aggregate({
+    where: { status: "COMPLETED" },
+    _sum: {
+      totalAmount: true,
+      paidAmount: true,
+    },
+    _count: {
+      id: true,
+    },
+  });
+
+  return {
+    orders,
+    pagination: {
+      total: totalCount,
+      page,
+      limit,
+      totalPages: Math.ceil(totalCount / limit),
+    },
+    summary: {
+      completedOrdersCount: summary._count.id || 0,
+      totalRevenue: summary._sum.paidAmount || summary._sum.totalAmount || 0,
+    },
+  };
+}
+

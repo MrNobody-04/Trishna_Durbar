@@ -20,6 +20,7 @@ import { formatNpr } from "@/lib/utils";
 import { toast } from "sonner";
 import { ManageCategoriesModal } from "@/components/menu/ManageCategoriesModal";
 import { CreateComboModal } from "@/components/menu/CreateComboModal";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface MenuItem {
   id: string;
@@ -76,6 +77,10 @@ export default function MenuPage() {
   const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
   const [editPriceVal, setEditPriceVal] = useState("");
   const [savingPrice, setSavingPrice] = useState(false);
+
+  // In-app Delete Confirmation Dialog State
+  const [dishToDelete, setDishToDelete] = useState<MenuItem | null>(null);
+  const [isDeletingDish, setIsDeletingDish] = useState(false);
 
   const fetchMenu = async () => {
     try {
@@ -195,18 +200,26 @@ export default function MenuPage() {
     }
   };
 
-  const handleDeleteDish = async (dish: MenuItem) => {
-    if (!confirm(`Are you sure you want to delete "${dish.nameEnglish}" from menu?`)) return;
+  const handleDeleteDish = (dish: MenuItem) => {
+    setDishToDelete(dish);
+  };
+
+  const executeDeleteDish = async () => {
+    if (!dishToDelete) return;
+    setIsDeletingDish(true);
 
     try {
-      const res = await fetch(`/api/menu/${dish.id}`, { method: "DELETE" });
+      const res = await fetch(`/api/menu/${dishToDelete.id}`, { method: "DELETE" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to delete dish");
 
-      toast.success(`"${dish.nameEnglish}" removed from menu`);
-      setItems((prev) => prev.filter((it) => it.id !== dish.id));
+      toast.success(`"${dishToDelete.nameEnglish}" removed from menu`);
+      setItems((prev) => prev.filter((it) => it.id !== dishToDelete.id));
+      setDishToDelete(null);
     } catch (err: any) {
       toast.error(err.message || "Failed to delete dish");
+    } finally {
+      setIsDeletingDish(false);
     }
   };
 
@@ -765,6 +778,19 @@ export default function MenuPage() {
         onClose={() => setCategoriesModalOpen(false)}
         categories={categories}
         onRefresh={fetchMenu}
+      />
+
+      {/* In-App Standard Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={!!dishToDelete}
+        title="Delete Menu Dish?"
+        message={`Are you sure you want to delete "${dishToDelete?.nameEnglish}" from the restaurant menu?`}
+        confirmLabel="Yes, Delete"
+        cancelLabel="No, Keep"
+        variant="danger"
+        isLoading={isDeletingDish}
+        onConfirm={executeDeleteDish}
+        onCancel={() => setDishToDelete(null)}
       />
     </div>
   );

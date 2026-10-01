@@ -136,3 +136,29 @@ export function getNepalDateRange(period: TimePeriod): { start: Date; end: Date 
     end: new Date(end.getTime() - offsetMs),
   };
 }
+
+export function formatOrderNumber(order?: {
+  id?: string;
+  orderNumber?: number | null;
+  createdAt?: Date | string;
+} | null): string {
+  if (!order) return "2026-01";
+  const d = order.createdAt ? new Date(order.createdAt) : new Date();
+  const year = !isNaN(d.getTime()) ? d.getFullYear() : 2026;
+
+  if (typeof order.orderNumber === "number" && order.orderNumber > 0) {
+    return `${year}-${String(order.orderNumber).padStart(2, "0")}`;
+  }
+
+  // Fallback if orderNumber was not set yet: derive sequential 2-digit index or default to 01
+  if (order.id) {
+    const digits = order.id.replace(/\D/g, "");
+    if (digits.length >= 2) {
+      const parsed = parseInt(digits.slice(-2), 10);
+      if (parsed > 0) return `${year}-${String(parsed).padStart(2, "0")}`;
+    }
+  }
+
+  return `${year}-01`;
+}
+

@@ -14,127 +14,222 @@ export function RoyalDurbarLogo({
   showText = true,
 }: RoyalDurbarLogoProps) {
   const iconSizes = {
-    sm: "h-8 w-8",
-    md: "h-10 w-10",
-    lg: "h-14 w-14",
-    xl: "h-20 w-20",
+    sm: "h-9 w-9",
+    md: "h-11 w-11",
+    lg: "h-16 w-16",
+    xl: "h-22 w-22",
   };
 
   return (
     <div className={`flex items-center gap-3 select-none ${className}`}>
-      {/* 3D Radiant 24K Gold Durbar Royal Crest */}
+      {/* 👑 3D Handcrafted 24K Gold Heraldic Royal Crest */}
       <div
-        className={`relative flex items-center justify-center shrink-0 ${iconSizes[size]} rounded-2xl bg-gradient-to-b from-stone-900 via-neutral-950 to-black dark:from-[#1c1810] dark:via-[#0d0b07] dark:to-[#030303] border-2 border-amber-500/60 shadow-lg shadow-amber-500/25 group transition-transform duration-300 hover:scale-105`}
+        className={`relative flex items-center justify-center shrink-0 ${iconSizes[size]} rounded-2xl bg-gradient-to-b from-[#18130c] via-[#0d0a07] to-[#040302] border-2 border-amber-500/70 shadow-[0_4px_16px_rgba(217,119,6,0.35),_inset_0_1px_1px_rgba(255,255,255,0.25)] group transition-all duration-300 hover:scale-105 hover:border-amber-400`}
       >
-        {/* Radiant Ambient Gold Glow */}
-        <div className="absolute inset-0 rounded-2xl bg-radial from-amber-400/30 via-transparent to-transparent opacity-90 pointer-events-none" />
+        {/* Ambient Palace Gold Halo */}
+        <div className="absolute inset-0 rounded-2xl bg-radial from-amber-400/25 via-transparent to-transparent opacity-90 pointer-events-none" />
 
-        {/* Precision Ornate Durbar Royal Crest SVG */}
+        {/* Heraldic Royal Durbar SVG Crest */}
         <svg
-          viewBox="0 0 100 100"
-          className="relative z-10 w-[82%] h-[82%] drop-shadow-[0_2px_10px_rgba(245,158,11,0.65)]"
+          viewBox="0 0 140 140"
+          className="relative z-10 w-[88%] h-[88%] drop-shadow-[0_2px_8px_rgba(245,158,11,0.55)]"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
-            <linearGradient id="imperialGold24k" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#FFF9D2" />
-              <stop offset="20%" stopColor="#FFE169" />
+            {/* 24K Imperial Gold Gradient */}
+            <linearGradient id="durbarGold24k" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FFFBEB" />
+              <stop offset="18%" stopColor="#FDE68A" />
               <stop offset="45%" stopColor="#F59E0B" />
               <stop offset="75%" stopColor="#D97706" />
-              <stop offset="100%" stopColor="#854D0E" />
+              <stop offset="100%" stopColor="#78350F" />
             </linearGradient>
-            <linearGradient id="brightShine" x1="0%" y1="0%" x2="0%" y2="100%">
+
+            {/* Specular Chiseled Shine */}
+            <linearGradient id="chiseledShine" x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stopColor="#FFFFFF" />
-              <stop offset="30%" stopColor="#FEF08A" />
-              <stop offset="70%" stopColor="#F59E0B" />
-              <stop offset="100%" stopColor="#B45309" />
+              <stop offset="25%" stopColor="#FEF08A" />
+              <stop offset="65%" stopColor="#F59E0B" />
+              <stop offset="100%" stopColor="#92400E" />
             </linearGradient>
-            <linearGradient id="rubyCrownJewel" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#FF4D6D" />
-              <stop offset="50%" stopColor="#E11D48" />
-              <stop offset="100%" stopColor="#881337" />
-            </linearGradient>
-            <radialGradient id="portalGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#FDE047" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#D97706" stopOpacity="0" />
+
+            {/* Shield Body Gradient */}
+            <radialGradient id="shieldObsidian" cx="50%" cy="40%" r="65%">
+              <stop offset="0%" stopColor="#251d13" />
+              <stop offset="60%" stopColor="#0f0c08" />
+              <stop offset="100%" stopColor="#040302" />
+            </radialGradient>
+
+            {/* Crown Ruby Cabochon */}
+            <radialGradient id="crownRuby" cx="35%" cy="35%" r="65%">
+              <stop offset="0%" stopColor="#FFA4B6" />
+              <stop offset="40%" stopColor="#E11D48" />
+              <stop offset="85%" stopColor="#881337" />
+              <stop offset="100%" stopColor="#4C0519" />
+            </radialGradient>
+
+            {/* Crown Emerald Jewel */}
+            <radialGradient id="crownEmerald" cx="35%" cy="35%" r="65%">
+              <stop offset="0%" stopColor="#A7F3D0" />
+              <stop offset="45%" stopColor="#10B981" />
+              <stop offset="85%" stopColor="#047857" />
+              <stop offset="100%" stopColor="#064E3B" />
             </radialGradient>
           </defs>
 
-          {/* Durbar Palace Pagoda Pinnacle Spire (Gajur) */}
+          {/* ============================================================== */}
+          {/* 1. NEPALI ROYAL DURBAR CROWN (SHREEPECH / GAJUR PINNACLE)      */}
+          {/* ============================================================== */}
+          {/* Gajur Pinnacle Spire */}
           <path
-            d="M50 3 L53.5 13 L46.5 13 Z"
-            fill="url(#brightShine)"
+            d="M70 4 L73.5 14 L66.5 14 Z"
+            fill="url(#chiseledShine)"
           />
-          <circle cx="50" cy="14" r="2.5" fill="url(#imperialGold24k)" />
+          <circle cx="70" cy="15" r="2.4" fill="url(#durbarGold24k)" />
 
-          {/* Palace Multi-tier Pagoda Curved Eaves (Traditional Nepali Architecture) */}
+          {/* Royal Crown Eaves / Arches */}
           <path
-            d="M50 15 C38 17.5, 29 21.5, 20 25 C25 27, 34 26, 50 25 C66 26, 75 27, 80 25 C71 21.5, 62 17.5, 50 15 Z"
-            fill="url(#brightShine)"
-          />
-          <path
-            d="M50 23.5 C39 25.5, 30 29, 14 33.5 C21 35.5, 32 34.5, 50 33.5 C68 34.5, 79 35.5, 86 33.5 C70 29, 61 25.5, 50 23.5 Z"
-            fill="url(#imperialGold24k)"
-          />
-
-          {/* Royal Crown Arch */}
-          <path
-            d="M25 39 C25 39, 34 47.5, 50 47.5 C66 47.5, 75 39, 75 39 L73 59 C73 66, 63 71, 50 71 C37 71, 27 66, 27 59 Z"
-            fill="url(#imperialGold24k)"
-            stroke="url(#brightShine)"
-            strokeWidth="0.8"
+            d="M48 27 C54 22, 63 19, 70 19 C77 19, 86 22, 92 27 L90 31 C84 27, 77 24, 70 24 C63 24, 56 27, 50 31 Z"
+            fill="url(#durbarGold24k)"
           />
 
-          {/* Ornate Royal Crown Spikes & Radiant Jewels */}
-          <circle cx="27" cy="38" r="2.6" fill="url(#brightShine)" />
-          <circle cx="38" cy="34.5" r="2.4" fill="url(#brightShine)" />
-          <circle cx="50" cy="31" r="3.4" fill="url(#rubyCrownJewel)" stroke="url(#brightShine)" strokeWidth="1" />
-          <circle cx="62" cy="34.5" r="2.4" fill="url(#brightShine)" />
-          <circle cx="73" cy="38" r="2.6" fill="url(#brightShine)" />
+          {/* Crown Jewels (Ruby Center + Emerald Accents + Pearls) */}
+          <circle cx="70" cy="22" r="3.2" fill="url(#crownRuby)" stroke="url(#chiseledShine)" strokeWidth="0.8" />
+          <circle cx="58" cy="24.5" r="2.2" fill="url(#crownEmerald)" stroke="url(#durbarGold24k)" strokeWidth="0.6" />
+          <circle cx="82" cy="24.5" r="2.2" fill="url(#crownEmerald)" stroke="url(#durbarGold24k)" strokeWidth="0.6" />
+          <circle cx="48" cy="27" r="1.8" fill="url(#chiseledShine)" />
+          <circle cx="92" cy="27" r="1.8" fill="url(#chiseledShine)" />
 
-          {/* Durbar Palace Gateway Arch (Darbar Torana) */}
+          {/* ============================================================== */}
+          {/* 2. DURBAR HERALDIC SHIELD (OUTER 3D GOLD RIM + INNER OBSIDIAN) */}
+          {/* ============================================================== */}
+          {/* Outer Shield Gold Border */}
           <path
-            d="M35 50 C35 42, 65 42, 65 50 L65 79 L35 79 Z"
-            fill="#060606"
-            stroke="url(#brightShine)"
-            strokeWidth="1.6"
+            d="M26 31 Q70 26 114 31 C112 73 98 103 70 119 C42 103 28 73 26 31 Z"
+            fill="url(#durbarGold24k)"
+            stroke="url(#chiseledShine)"
+            strokeWidth="1.2"
           />
-          {/* Inner Golden Sanctuary Arch */}
+
+          {/* Inner Recessed Obsidian Field */}
           <path
-            d="M41 55 C41 48, 59 48, 59 55 L59 79 L41 79 Z"
-            fill="url(#portalGlow)"
-            stroke="url(#imperialGold24k)"
+            d="M31 35 Q70 31 109 35 C107 72 94 99 70 113 C46 99 33 72 31 35 Z"
+            fill="url(#shieldObsidian)"
+            stroke="url(#durbarGold24k)"
             strokeWidth="1"
           />
 
-          {/* Royal Pedestal Base Plinth */}
+          {/* Fine Inner Shield Golden Filigree Trim */}
           <path
-            d="M18 79 L82 79 L78 86.5 L22 86.5 Z"
-            fill="url(#imperialGold24k)"
-          />
-          <path
-            d="M14 86.5 L86 86.5 L82.5 93 L17.5 93 Z"
-            fill="url(#brightShine)"
+            d="M36 39 Q70 36 104 39 C102 70 91 94 70 107 C49 94 38 70 36 39 Z"
+            fill="none"
+            stroke="url(#durbarGold24k)"
+            strokeWidth="0.75"
+            strokeDasharray="2 1.5"
+            opacity="0.7"
           />
 
-          {/* Emblem 8-Pointed Star of Durbar Royalty */}
-          <polygon
-            points="50,59 52,64 57.5,64 53,67.5 55,73 50,69.5 45,73 47,67.5 42.5,64 48,64"
-            fill="url(#brightShine)"
+          {/* ============================================================== */}
+          {/* 3. FLANKING NEPALI LOTUS MOTIFS (कमल पुष्प)                   */}
+          {/* ============================================================== */}
+          {/* Left Floral Lotus Branch */}
+          <path
+            d="M38 60 C35 66 38 74 42 78 C39 74 38 68 41 62 Z"
+            fill="url(#durbarGold24k)"
+            opacity="0.85"
           />
+          <path
+            d="M37 72 C35 79 39 86 44 90 C40 86 39 79 41 74 Z"
+            fill="url(#durbarGold24k)"
+            opacity="0.75"
+          />
+
+          {/* Right Floral Lotus Branch */}
+          <path
+            d="M102 60 C105 66 102 74 98 78 C101 74 102 68 99 62 Z"
+            fill="url(#durbarGold24k)"
+            opacity="0.85"
+          />
+          <path
+            d="M103 72 C105 79 101 86 96 90 C100 86 101 79 99 74 Z"
+            fill="url(#durbarGold24k)"
+            opacity="0.75"
+          />
+
+          {/* ============================================================== */}
+          {/* 4. CHISELED IMPERIAL "TD" INTERLOCKING MONOGRAM                 */}
+          {/* ============================================================== */}
+          {/* LETTER "T" Top Crossbar with Classical Serif Flairs */}
+          <path
+            d="M48 48 L92 48 L92 53.5 L86 53.5 C83 53.5 81 54 81 56 L81 57 L74 57 L74 56 C74 54 72 53.5 69 53.5 L63 53.5 C60 53.5 58 54 58 56 L58 57 L51 57 L51 53.5 C49 53.5 48 53.5 48 48 Z"
+            fill="url(#chiseledShine)"
+          />
+          {/* LETTER "T" Vertical Stem & Sculpted Base */}
+          <path
+            d="M66 54 L74 54 L74 88 L79 88 L79 92 L61 92 L61 88 L66 88 Z"
+            fill="url(#chiseledShine)"
+          />
+
+          {/* LETTER "D" Intertwined Majestic Arch */}
+          <path
+            d="M56 53 C64 51, 86 52, 90 68 C93 80, 84 90, 71 90 L61 90 L61 85 L69 85 C78 85, 84 79, 82 70 C80 61, 72 57, 62 57 L56 57 Z"
+            fill="url(#durbarGold24k)"
+            stroke="url(#chiseledShine)"
+            strokeWidth="0.8"
+          />
+
+          {/* Monogram Highlight Bevels */}
+          <path
+            d="M68 56 L72 56 L72 87 L68 87 Z"
+            fill="#FFFBEB"
+            opacity="0.4"
+          />
+
+          {/* ============================================================== */}
+          {/* 5. ROYAL THREE STARS OF EXCELLENCE (तृष्णा दरबार)               */}
+          {/* ============================================================== */}
+          {/* Center Main Star */}
+          <polygon
+            points="70,98 71.8,102.5 76.5,102.5 72.8,105.2 74.2,109.8 70,107 65.8,109.8 67.2,105.2 63.5,102.5 68.2,102.5"
+            fill="url(#chiseledShine)"
+          />
+          {/* Left Star */}
+          <polygon
+            points="58,99 59.4,102.5 63,102.5 60.1,104.6 61.2,108.2 58,106 54.8,108.2 55.9,104.6 53,102.5 56.6,102.5"
+            fill="url(#durbarGold24k)"
+          />
+          {/* Right Star */}
+          <polygon
+            points="82,99 83.4,102.5 87,102.5 84.1,104.6 85.2,108.2 82,106 78.8,108.2 79.9,104.6 77,102.5 80.6,102.5"
+            fill="url(#durbarGold24k)"
+          />
+
+          {/* ============================================================== */}
+          {/* 6. BOTTOM ROYAL BASE PEDESTAL & RIBBON SCROLL                  */}
+          {/* ============================================================== */}
+          <path
+            d="M38 120 Q70 126 102 120 L105 127 Q70 133 35 127 Z"
+            fill="url(#chiseledShine)"
+            stroke="url(#durbarGold24k)"
+            strokeWidth="0.8"
+          />
+          {/* Small diamond studs on banner */}
+          <polygon points="70,123.5 72.5,126 70,128.5 67.5,126" fill="#78350F" />
+          <polygon points="54,122.5 56,124.5 54,126.5 52,124.5" fill="#78350F" />
+          <polygon points="86,122.5 88,124.5 86,126.5 84,124.5" fill="#78350F" />
         </svg>
 
-        {/* Top Glare Reflection */}
-        <div className="absolute inset-x-1.5 top-1 h-[45%] rounded-t-xl bg-gradient-to-b from-white/25 via-white/5 to-transparent pointer-events-none" />
+        {/* Glossy Upper Edge Light Glint */}
+        <div className="absolute inset-x-2 top-0.5 h-[40%] rounded-t-xl bg-gradient-to-b from-white/20 via-white/5 to-transparent pointer-events-none" />
       </div>
 
-      {/* High-Definition Royal Typography */}
+      {/* 👑 Bespoke Royal Typography */}
       {showText && (
         <div className="flex flex-col">
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-2">
             <span
-              className={`font-black tracking-wider uppercase text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-amber-500 to-amber-700 dark:from-amber-300 dark:via-yellow-200 dark:to-amber-500 drop-shadow-[0_1px_2px_rgba(245,158,11,0.3)] ${
+              className={`font-black tracking-[0.14em] uppercase text-transparent bg-clip-text bg-gradient-to-r from-amber-700 via-amber-600 to-amber-800 dark:from-amber-200 dark:via-amber-400 dark:to-yellow-300 drop-shadow-[0_1px_2px_rgba(217,119,6,0.3)] font-serif ${
                 size === "sm"
                   ? "text-sm"
                   : size === "lg"
@@ -146,12 +241,12 @@ export function RoyalDurbarLogo({
             >
               TRISHNA DURBAR
             </span>
-            <span className="hidden md:inline-flex text-[9px] font-black tracking-widest text-amber-700 dark:text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full border border-amber-500/40 uppercase shadow-xs">
-              ROYAL RESTAURANT
+            <span className="hidden md:inline-flex text-[9px] font-black tracking-widest text-amber-800 dark:text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-md border border-amber-500/40 uppercase shadow-xs">
+              RESTRO & BAR
             </span>
           </div>
-          <span className="text-[10px] sm:text-[11px] font-bold text-amber-700/90 dark:text-amber-400/90 tracking-wide">
-            तृष्णा दरबार रेष्टुरेन्ट एण्ड बार
+          <span className="text-[10px] sm:text-[11px] font-bold text-amber-800/90 dark:text-amber-400/90 tracking-wide font-sans">
+            तृष्णा दरबार • शाही स्वाद र आतिथ्य
           </span>
         </div>
       )}

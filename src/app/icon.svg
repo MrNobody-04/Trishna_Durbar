@@ -1,61 +1,85 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" width="100%" height="100%">
   <defs>
-    <linearGradient id="imperialGold24k" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stopColor="#FFF9D2" />
-      <stop offset="20%" stopColor="#FFE169" />
+    <linearGradient id="durbarGold24k" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#FFFBEB" />
+      <stop offset="18%" stopColor="#FDE68A" />
       <stop offset="45%" stopColor="#F59E0B" />
       <stop offset="75%" stopColor="#D97706" />
-      <stop offset="100%" stopColor="#854D0E" />
+      <stop offset="100%" stopColor="#78350F" />
     </linearGradient>
-    <linearGradient id="brightShine" x1="0%" y1="0%" x2="0%" y2="100%">
+
+    <linearGradient id="chiseledShine" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stopColor="#FFFFFF" />
-      <stop offset="30%" stopColor="#FEF08A" />
-      <stop offset="70%" stopColor="#F59E0B" />
-      <stop offset="100%" stopColor="#B45309" />
+      <stop offset="25%" stopColor="#FEF08A" />
+      <stop offset="65%" stopColor="#F59E0B" />
+      <stop offset="100%" stopColor="#92400E" />
     </linearGradient>
-    <linearGradient id="rubyCrownJewel" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stopColor="#FF4D6D" />
-      <stop offset="50%" stopColor="#E11D48" />
-      <stop offset="100%" stopColor="#881337" />
-    </linearGradient>
-    <radialGradient id="portalGlow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stopColor="#FDE047" stopOpacity="0.4" />
-      <stop offset="100%" stopColor="#D97706" stopOpacity="0" />
+
+    <radialGradient id="shieldObsidian" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stopColor="#251d13" />
+      <stop offset="60%" stopColor="#0f0c08" />
+      <stop offset="100%" stopColor="#040302" />
+    </radialGradient>
+
+    <radialGradient id="crownRuby" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stopColor="#FFA4B6" />
+      <stop offset="40%" stopColor="#E11D48" />
+      <stop offset="85%" stopColor="#881337" />
+      <stop offset="100%" stopColor="#4C0519" />
+    </radialGradient>
+
+    <radialGradient id="crownEmerald" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stopColor="#A7F3D0" />
+      <stop offset="45%" stopColor="#10B981" />
+      <stop offset="85%" stopColor="#047857" />
+      <stop offset="100%" stopColor="#064E3B" />
     </radialGradient>
   </defs>
 
-  <!-- Dark Obsidian Shield Background -->
-  <rect width="100" height="100" rx="22" fill="#0C0A09" stroke="#F59E0B" stroke-width="3" />
+  <!-- Dark Obsidian Rounded App Icon Canvas -->
+  <rect width="140" height="140" rx="32" fill="#0C0A09" stroke="#F59E0B" stroke-width="3" />
+  <circle cx="70" cy="70" r="55" fill="#F59E0B" opacity="0.08" />
 
-  <!-- Inner Ambient Glow -->
-  <circle cx="50" cy="50" r="40" fill="url(#portalGlow)" opacity="0.3" />
+  <!-- Gajur Pinnacle Spire -->
+  <path d="M70 10 L73.5 20 L66.5 20 Z" fill="url(#chiseledShine)" />
+  <circle cx="70" cy="21" r="2.4" fill="url(#durbarGold24k)" />
 
-  <!-- Pagoda Pinnacle Spire (Gajur) -->
-  <path d="M50 7 L53.5 17 L46.5 17 Z" fill="url(#brightShine)" />
-  <circle cx="50" cy="18" r="2.2" fill="url(#imperialGold24k)" />
-
-  <!-- Pagoda Curved Eaves (Traditional Nepali Durbar) -->
-  <path d="M50 19 C38 21.5, 29 25, 20 28 C25 30, 34 29, 50 28 C66 29, 75 30, 80 28 C71 25, 62 21.5, 50 19 Z" fill="url(#brightShine)" />
-  <path d="M50 26.5 C39 28.5, 30 31.5, 16 35.5 C22 37.5, 32 36.5, 50 35.5 C68 36.5, 78 37.5, 84 35.5 C70 31.5, 61 28.5, 50 26.5 Z" fill="url(#imperialGold24k)" />
-
-  <!-- Royal Crown Arch -->
-  <path d="M25 40 C25 40, 34 48, 50 48 C66 48, 75 40, 75 40 L73 59 C73 66, 63 71, 50 71 C37 71, 27 66, 27 59 Z" fill="url(#imperialGold24k)" stroke="url(#brightShine)" stroke-width="0.8" />
+  <!-- Royal Crown Eaves / Arches -->
+  <path d="M48 31 C54 26, 63 23, 70 23 C77 23, 86 26, 92 31 L90 35 C84 31, 77 28, 70 28 C63 28, 56 31, 50 35 Z" fill="url(#durbarGold24k)" />
 
   <!-- Crown Jewels -->
-  <circle cx="27" cy="39" r="2.5" fill="url(#brightShine)" />
-  <circle cx="38" cy="35.5" r="2.3" fill="url(#brightShine)" />
-  <circle cx="50" cy="32" r="3.2" fill="url(#rubyCrownJewel)" stroke="url(#brightShine)" stroke-width="0.8" />
-  <circle cx="62" cy="35.5" r="2.3" fill="url(#brightShine)" />
-  <circle cx="73" cy="39" r="2.5" fill="url(#brightShine)" />
+  <circle cx="70" cy="26" r="3.2" fill="url(#crownRuby)" stroke="url(#chiseledShine)" stroke-width="0.8" />
+  <circle cx="58" cy="28.5" r="2.2" fill="url(#crownEmerald)" stroke="url(#durbarGold24k)" stroke-width="0.6" />
+  <circle cx="82" cy="28.5" r="2.2" fill="url(#crownEmerald)" stroke="url(#durbarGold24k)" stroke-width="0.6" />
+  <circle cx="48" cy="31" r="1.8" fill="url(#chiseledShine)" />
+  <circle cx="92" cy="31" r="1.8" fill="url(#chiseledShine)" />
 
-  <!-- Durbar Torana Arch Gateway -->
-  <path d="M35 50 C35 42, 65 42, 65 50 L65 77 L35 77 Z" fill="#030303" stroke="url(#brightShine)" stroke-width="1.5" />
-  <path d="M41 55 C41 48, 59 48, 59 55 L59 77 L41 77 Z" fill="url(#portalGlow)" stroke="url(#imperialGold24k)" stroke-width="1" />
+  <!-- Outer Shield Gold Border -->
+  <path d="M26 35 Q70 30 114 35 C112 77 98 107 70 123 C42 107 28 77 26 35 Z" fill="url(#durbarGold24k)" stroke="url(#chiseledShine)" stroke-width="1.2" />
 
-  <!-- Base Plinth -->
-  <path d="M20 77 L80 77 L76 84 L24 84 Z" fill="url(#imperialGold24k)" />
-  <path d="M16 84 L84 84 L80.5 90 L19.5 90 Z" fill="url(#brightShine)" />
+  <!-- Inner Recessed Obsidian Field -->
+  <path d="M31 39 Q70 35 109 39 C107 76 94 103 70 117 C46 103 33 76 31 39 Z" fill="url(#shieldObsidian)" stroke="url(#durbarGold24k)" stroke-width="1" />
 
-  <!-- Royal 8-pointed star -->
-  <polygon points="50,58 52,63 57.5,63 53,66.5 55,72 50,68.5 45,72 47,66.5 42.5,63 48,63" fill="url(#brightShine)" />
+  <!-- Inner Shield Trim -->
+  <path d="M36 43 Q70 40 104 43 C102 74 91 98 70 111 C49 98 38 74 36 43 Z" fill="none" stroke="url(#durbarGold24k)" stroke-width="0.75" stroke-dasharray="2 1.5" opacity="0.7" />
+
+  <!-- Flanking Lotus Leaves -->
+  <path d="M38 64 C35 70 38 78 42 82 C39 78 38 72 41 66 Z" fill="url(#durbarGold24k)" opacity="0.85" />
+  <path d="M102 64 C105 70 102 78 98 82 C101 78 102 72 99 66 Z" fill="url(#durbarGold24k)" opacity="0.85" />
+
+  <!-- TD Monogram (Letter T) -->
+  <path d="M48 52 L92 52 L92 57.5 L86 57.5 C83 57.5 81 58 81 60 L81 61 L74 61 L74 60 C74 58 72 57.5 69 57.5 L63 57.5 C60 57.5 58 58 58 60 L58 61 L51 61 L51 57.5 C49 57.5 48 57.5 48 52 Z" fill="url(#chiseledShine)" />
+  <path d="M66 58 L74 58 L74 92 L79 92 L79 96 L61 96 L61 92 L66 92 Z" fill="url(#chiseledShine)" />
+
+  <!-- TD Monogram (Letter D) -->
+  <path d="M56 57 C64 55, 86 56, 90 72 C93 84, 84 94, 71 94 L61 94 L61 89 L69 89 C78 89, 84 83, 82 74 C80 65, 72 61, 62 61 L56 61 Z" fill="url(#durbarGold24k)" stroke="url(#chiseledShine)" stroke-width="0.8" />
+
+  <!-- Stars -->
+  <polygon points="70,102 71.8,106.5 76.5,106.5 72.8,109.2 74.2,113.8 70,111 65.8,113.8 67.2,109.2 63.5,106.5 68.2,106.5" fill="url(#chiseledShine)" />
+  <polygon points="58,103 59.4,106.5 63,106.5 60.1,108.6 61.2,112.2 58,110 54.8,112.2 55.9,108.6 53,106.5 56.6,106.5" fill="url(#durbarGold24k)" />
+  <polygon points="82,103 83.4,106.5 87,106.5 84.1,108.6 85.2,112.2 82,110 78.8,112.2 79.9,108.6 77,106.5 80.6,106.5" fill="url(#durbarGold24k)" />
+
+  <!-- Bottom Banner -->
+  <path d="M38 124 Q70 130 102 124 L105 131 Q70 137 35 131 Z" fill="url(#chiseledShine)" stroke="url(#durbarGold24k)" stroke-width="0.8" />
+  <polygon points="70,127.5 72.5,130 70,132.5 67.5,130" fill="#78350F" />
 </svg>

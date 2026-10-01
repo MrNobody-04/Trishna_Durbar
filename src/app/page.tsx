@@ -94,9 +94,14 @@ export default function DashboardLandingPage() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 8000);
+    const interval = setInterval(() => {
+      // Avoid background polling interference while any order or payment modal is open
+      if (!orderModalOpen && !billModalOpen && !printModalOpen && !qrModalOpen && !manageTablesModalOpen) {
+        fetchData();
+      }
+    }, 8000);
     return () => clearInterval(interval);
-  }, []);
+  }, [orderModalOpen, billModalOpen, printModalOpen, qrModalOpen, manageTablesModalOpen]);
 
   const filteredTables = tables.filter((t) => {
     if (selectedFloor === "ALL") return true;
@@ -115,49 +120,63 @@ export default function DashboardLandingPage() {
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-200">
-      {/* 👑 EXECUTIVE DASHBOARD HEADER */}
-      <div className="relative overflow-hidden rounded-3xl bg-card border border-border p-5 sm:p-7 shadow-lg transition-colors">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+      {/* 👑 EXECUTIVE ROYAL DURBAR COMMAND CENTER */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-50/80 via-white to-amber-100/30 dark:from-[#1b150d] dark:via-[#0e0b08] dark:to-[#140f09] border-2 border-amber-500/35 p-5 sm:p-7 shadow-[0_16px_40px_rgba(217,119,6,0.1),_inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.6),_inset_0_1px_0_rgba(251,191,36,0.2)] transition-colors">
+        {/* Subtle Ambient Palace Gold Light in Background */}
+        <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-amber-400/15 dark:bg-amber-500/10 blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
           <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/30">
-                Operations & Financial Dashboard
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] font-black uppercase tracking-widest text-amber-800 dark:text-amber-300 bg-amber-500/20 px-3 py-1 rounded-full border border-amber-500/40 shadow-xs">
+                👑 Palace Operations & Financial Engine
               </span>
-              <span className="text-xs text-muted-foreground">• Live Floor Matrix</span>
+              <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/10 dark:bg-emerald-500/15 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Live Matrix Synced</span>
+              </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
-              Trishna Durbar Command Center
-            </h1>
+            <div>
+              <span className="text-xs font-bold text-amber-700/80 dark:text-amber-400/80 tracking-wide block">
+                तृष्णा दरबार कमाण्ड सेन्टर
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
+                Trishna Durbar Command Center
+              </h1>
+            </div>
             <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl">
-              Real-time table orders across Ground Floor, Main Hall, First Floor, and Rooftop, with live POS settlement, kitchen ticketing, and operational outflows.
+              Live floor management across Ground Floor, Main Hall, 1st Floor VIP, and Rooftop Terrace, with real-time dining tables, KOT ticketing, and instant POS billing.
             </p>
           </div>
 
-          {/* Quick Action Buttons */}
-          <div className="flex flex-wrap items-center gap-2.5">
+          {/* Quick Action Buttons with 3D Tactile Styling */}
+          <div className="relative z-10 flex flex-wrap items-center gap-2.5">
             <button
+              type="button"
               onClick={() => {
                 setActiveTable(tables[0] || null);
                 setOrderModalMode("NEW");
                 setOrderModalOpen(true);
               }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-amber-400 shadow-md shadow-amber-500/20 transition-all hover:scale-[1.02]"
+              className="flex items-center gap-2 px-4.5 py-2.5 rounded-2xl text-xs font-black text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-amber-400 shadow-[0_4px_0_0_#b45309,_0_8px_18px_rgba(245,158,11,0.35)] transition-all active:translate-y-1 active:shadow-[0_1px_0_0_#b45309]"
             >
-              <PlusCircle className="h-4 w-4" />
+              <PlusCircle className="h-4 w-4 stroke-[2.5]" />
               <span>+ Take Order</span>
             </button>
 
             <button
+              type="button"
               onClick={() => setManageTablesModalOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-secondary hover:bg-secondary/80 border border-amber-500/30 text-xs font-bold text-foreground transition-colors"
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-secondary/80 hover:bg-secondary border-2 border-amber-500/35 text-xs font-bold text-foreground transition-all shadow-[0_2px_0_0_rgba(0,0,0,0.15)] active:translate-y-0.5"
             >
               <Layers className="h-4 w-4 text-amber-500" />
               <span>Manage Tables</span>
             </button>
 
             <button
+              type="button"
               onClick={() => setQrModalOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-secondary hover:bg-secondary/80 border border-border text-xs font-bold text-foreground transition-colors"
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-secondary/80 hover:bg-secondary border border-border text-xs font-bold text-foreground transition-all shadow-[0_2px_0_0_rgba(0,0,0,0.1)] active:translate-y-0.5"
             >
               <QrCode className="h-4 w-4 text-amber-500" />
               <span>Show QR</span>
@@ -165,47 +184,51 @@ export default function DashboardLandingPage() {
 
             <Link
               href="/expenses"
-              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-secondary hover:bg-secondary/80 border border-border text-xs font-bold text-foreground transition-colors"
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-secondary/80 hover:bg-secondary border border-border text-xs font-bold text-foreground transition-all shadow-[0_2px_0_0_rgba(0,0,0,0.1)] active:translate-y-0.5"
             >
               <Receipt className="h-4 w-4 text-amber-500" />
               <span>Expenses</span>
             </Link>
 
             <button
+              type="button"
               onClick={fetchData}
-              className="p-2.5 rounded-2xl bg-secondary hover:bg-secondary/80 border border-border text-foreground transition-colors"
+              className="p-2.5 rounded-2xl bg-secondary/80 hover:bg-secondary border border-border text-foreground transition-all shadow-[0_2px_0_0_rgba(0,0,0,0.1)] active:translate-y-0.5"
               title="Refresh Dashboard"
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className="h-4 w-4 text-amber-500" />
             </button>
           </div>
         </div>
 
-        {/* 📊 LIVE KPI PERFORMANCE CARDS */}
+        {/* 📊 LIVE 3D KPI PERFORMANCE WIDGETS */}
         {metrics && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mt-6 pt-6 border-t border-border">
-            <div className="p-3.5 rounded-2xl bg-secondary/50 border border-border">
-              <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mt-6 pt-6 border-t-2 border-amber-500/20">
+            {/* 1. Today's Revenue */}
+            <div className="p-3.5 rounded-2xl bg-card dark:bg-[#15110a] border-2 border-amber-500/35 shadow-[0_4px_12px_rgba(217,119,6,0.12),_inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4),_inset_0_1px_0_rgba(251,191,36,0.2)] transition-transform hover:-translate-y-0.5">
+              <span className="text-[10px] uppercase font-black tracking-wider text-amber-700 dark:text-amber-400 block">
                 Today&apos;s Revenue
               </span>
               <p className="text-lg sm:text-xl font-black text-amber-600 dark:text-amber-300 font-mono mt-1">
                 {formatNpr(metrics.totalRevenue)}
               </p>
-              <span className="text-[10px] text-muted-foreground">{metrics.totalOrders} settled orders</span>
+              <span className="text-[10px] text-muted-foreground font-semibold">{metrics.totalOrders} settled orders</span>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-secondary/50 border border-border">
-              <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+            {/* 2. Today's Outflows */}
+            <div className="p-3.5 rounded-2xl bg-card dark:bg-[#15110a] border-2 border-red-500/30 shadow-[0_4px_12px_rgba(239,68,68,0.08),_inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4),_inset_0_1px_0_rgba(239,68,68,0.2)] transition-transform hover:-translate-y-0.5">
+              <span className="text-[10px] uppercase font-black tracking-wider text-red-600 dark:text-red-400 block">
                 Today&apos;s Outflow
               </span>
               <p className="text-lg sm:text-xl font-black text-red-500 font-mono mt-1">
                 {formatNpr(metrics.totalExpense)}
               </p>
-              <span className="text-[10px] text-muted-foreground">Kitchen & utilities</span>
+              <span className="text-[10px] text-muted-foreground font-semibold">Kitchen & utilities</span>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-secondary/50 border border-border">
-              <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+            {/* 3. Net Profit */}
+            <div className="p-3.5 rounded-2xl bg-card dark:bg-[#15110a] border-2 border-emerald-500/35 shadow-[0_4px_12px_rgba(16,185,129,0.08),_inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4),_inset_0_1px_0_rgba(16,185,129,0.2)] transition-transform hover:-translate-y-0.5">
+              <span className="text-[10px] uppercase font-black tracking-wider text-emerald-600 dark:text-emerald-400 block">
                 Net Profit
               </span>
               <p
@@ -215,39 +238,42 @@ export default function DashboardLandingPage() {
               >
                 {formatNpr(metrics.netProfit)}
               </p>
-              <span className="text-[10px] text-muted-foreground">Sales - Expenses</span>
+              <span className="text-[10px] text-muted-foreground font-semibold">Sales - Outflow</span>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-secondary/50 border border-border">
-              <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+            {/* 4. Table Occupancy */}
+            <div className="p-3.5 rounded-2xl bg-card dark:bg-[#15110a] border-2 border-indigo-500/30 shadow-[0_4px_12px_rgba(99,102,241,0.08),_inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4),_inset_0_1px_0_rgba(99,102,241,0.2)] transition-transform hover:-translate-y-0.5">
+              <span className="text-[10px] uppercase font-black tracking-wider text-indigo-600 dark:text-indigo-400 block">
                 Table Occupancy
               </span>
               <p className="text-lg sm:text-xl font-black text-foreground font-mono mt-1">
                 {metrics.tableOccupancyRate}%
               </p>
-              <span className="text-[10px] text-muted-foreground">
-                {metrics.occupiedTables} / {metrics.totalTables} tables occupied
+              <span className="text-[10px] text-muted-foreground font-semibold">
+                {metrics.occupiedTables} / {metrics.totalTables} occupied
               </span>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-secondary/50 border border-border">
-              <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+            {/* 5. In-House Diners */}
+            <div className="p-3.5 rounded-2xl bg-card dark:bg-[#15110a] border-2 border-teal-500/30 shadow-[0_4px_12px_rgba(20,184,166,0.08),_inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4),_inset_0_1px_0_rgba(20,184,166,0.2)] transition-transform hover:-translate-y-0.5">
+              <span className="text-[10px] uppercase font-black tracking-wider text-teal-600 dark:text-teal-400 block">
                 Seated Diners
               </span>
-              <p className="text-lg sm:text-xl font-black text-emerald-600 dark:text-emerald-400 font-mono mt-1">
+              <p className="text-lg sm:text-xl font-black text-teal-600 dark:text-teal-400 font-mono mt-1">
                 {metrics.currentActiveDiners}
               </p>
-              <span className="text-[10px] text-muted-foreground">Guests in-house</span>
+              <span className="text-[10px] text-muted-foreground font-semibold">Guests dining now</span>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-secondary/50 border border-border">
-              <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+            {/* 6. Running Unsettled Ledger */}
+            <div className="p-3.5 rounded-2xl bg-card dark:bg-[#15110a] border-2 border-amber-500/35 shadow-[0_4px_12px_rgba(217,119,6,0.12),_inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4),_inset_0_1px_0_rgba(251,191,36,0.2)] transition-transform hover:-translate-y-0.5">
+              <span className="text-[10px] uppercase font-black tracking-wider text-amber-700 dark:text-amber-400 block">
                 Running Ledger
               </span>
               <p className="text-lg sm:text-xl font-black text-amber-600 dark:text-amber-400 font-mono mt-1">
                 {formatNpr(metrics.runningUnsettledRevenue)}
               </p>
-              <span className="text-[10px] text-muted-foreground">Unbilled active orders</span>
+              <span className="text-[10px] text-muted-foreground font-semibold">Unbilled active orders</span>
             </div>
           </div>
         )}

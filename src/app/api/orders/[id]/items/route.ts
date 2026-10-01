@@ -50,9 +50,9 @@ export async function DELETE(
       return NextResponse.json({ error: "Item ID is required" }, { status: 400 });
     }
 
-    await removeOrderItem(itemId, user.id, user.name);
+    const updatedOrder = await removeOrderItem(itemId, user.id, user.name);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, order: updatedOrder });
   } catch (error: any) {
     return NextResponse.json(
       { error: error?.message || "Failed to remove item" },
@@ -75,7 +75,7 @@ export async function PATCH(
     }
 
     const { updateOrderItem } = await import("@/server/services/dining.service");
-    const updated = await updateOrderItem(
+    const result = await updateOrderItem(
       itemId,
       {
         unitPrice: unitPrice !== undefined ? parseFloat(unitPrice) : undefined,
@@ -87,7 +87,7 @@ export async function PATCH(
       user.name
     );
 
-    return NextResponse.json({ success: true, item: updated });
+    return NextResponse.json({ success: true, item: result.item, order: result.order });
   } catch (error: any) {
     return NextResponse.json(
       { error: error?.message || "Failed to update item" },

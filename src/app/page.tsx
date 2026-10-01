@@ -120,37 +120,20 @@ export default function DashboardLandingPage() {
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-200">
-      {/* 👑 EXECUTIVE ROYAL DURBAR COMMAND CENTER */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-50/80 via-white to-amber-100/30 dark:from-[#1b150d] dark:via-[#0e0b08] dark:to-[#140f09] border-2 border-amber-500/35 p-5 sm:p-7 shadow-[0_16px_40px_rgba(217,119,6,0.1),_inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.6),_inset_0_1px_0_rgba(251,191,36,0.2)] transition-colors">
-        {/* Subtle Ambient Palace Gold Light in Background */}
-        <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-amber-400/15 dark:bg-amber-500/10 blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[11px] font-black uppercase tracking-widest text-amber-800 dark:text-amber-300 bg-amber-500/20 px-3 py-1 rounded-full border border-amber-500/40 shadow-xs">
-                👑 Palace Operations & Financial Engine
-              </span>
-              <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/10 dark:bg-emerald-500/15 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Live Matrix Synced</span>
-              </div>
-            </div>
-            <div>
-              <span className="text-xs font-bold text-amber-700/80 dark:text-amber-400/80 tracking-wide block">
-                तृष्णा दरबार कमाण्ड सेन्टर
-              </span>
-              <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
-                Trishna Durbar Command Center
-              </h1>
-            </div>
-            <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl">
-              Live floor management across Ground Floor, Main Hall, 1st Floor VIP, and Rooftop Terrace, with real-time dining tables, KOT ticketing, and instant POS billing.
+      {/* 👑 EXECUTIVE DASHBOARD HEADER */}
+      <div className="relative overflow-hidden rounded-3xl bg-card border border-border p-5 sm:p-6 shadow-sm transition-colors">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
+              Dashboard
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+              Live table operations, floor management, and POS billing.
             </p>
           </div>
 
-          {/* Quick Action Buttons with 3D Tactile Styling */}
-          <div className="relative z-10 flex flex-wrap items-center gap-2.5">
+          {/* Quick Action Buttons - Clean & Professional POS Toolbar */}
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => {
@@ -158,16 +141,16 @@ export default function DashboardLandingPage() {
                 setOrderModalMode("NEW");
                 setOrderModalOpen(true);
               }}
-              className="flex items-center gap-2 px-4.5 py-2.5 rounded-2xl text-xs font-black text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-amber-400 shadow-[0_4px_0_0_#b45309,_0_8px_18px_rgba(245,158,11,0.35)] transition-all active:translate-y-1 active:shadow-[0_1px_0_0_#b45309]"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-400 shadow-md shadow-amber-500/20 transition-all hover:scale-[1.01] active:scale-[0.98]"
             >
               <PlusCircle className="h-4 w-4 stroke-[2.5]" />
-              <span>+ Take Order</span>
+              <span>Take Order</span>
             </button>
 
             <button
               type="button"
               onClick={() => setManageTablesModalOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-secondary/80 hover:bg-secondary border-2 border-amber-500/35 text-xs font-bold text-foreground transition-all shadow-[0_2px_0_0_rgba(0,0,0,0.15)] active:translate-y-0.5"
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-secondary/80 hover:bg-secondary border border-border hover:border-amber-500/50 text-xs font-bold text-foreground transition-all shadow-xs active:scale-[0.98]"
             >
               <Layers className="h-4 w-4 text-amber-500" />
               <span>Manage Tables</span>
@@ -176,15 +159,15 @@ export default function DashboardLandingPage() {
             <button
               type="button"
               onClick={() => setQrModalOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-secondary/80 hover:bg-secondary border border-border text-xs font-bold text-foreground transition-all shadow-[0_2px_0_0_rgba(0,0,0,0.1)] active:translate-y-0.5"
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-secondary/80 hover:bg-secondary border border-border hover:border-amber-500/50 text-xs font-bold text-foreground transition-all shadow-xs active:scale-[0.98]"
             >
               <QrCode className="h-4 w-4 text-amber-500" />
-              <span>Show QR</span>
+              <span>Payment QR</span>
             </button>
 
             <Link
               href="/expenses"
-              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-secondary/80 hover:bg-secondary border border-border text-xs font-bold text-foreground transition-all shadow-[0_2px_0_0_rgba(0,0,0,0.1)] active:translate-y-0.5"
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-secondary/80 hover:bg-secondary border border-border hover:border-amber-500/50 text-xs font-bold text-foreground transition-all shadow-xs active:scale-[0.98]"
             >
               <Receipt className="h-4 w-4 text-amber-500" />
               <span>Expenses</span>
@@ -193,7 +176,7 @@ export default function DashboardLandingPage() {
             <button
               type="button"
               onClick={fetchData}
-              className="p-2.5 rounded-2xl bg-secondary/80 hover:bg-secondary border border-border text-foreground transition-all shadow-[0_2px_0_0_rgba(0,0,0,0.1)] active:translate-y-0.5"
+              className="p-2.5 rounded-xl bg-secondary/80 hover:bg-secondary border border-border hover:border-amber-500/50 text-foreground transition-all shadow-xs active:scale-[0.98]"
               title="Refresh Dashboard"
             >
               <RefreshCw className="h-4 w-4 text-amber-500" />

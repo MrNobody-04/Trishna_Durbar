@@ -286,11 +286,16 @@ export async function removeOrderItem(
     const newSubtotal = remainingItems.reduce((acc, it) => acc + it.total, 0);
     const newTotal = Math.max(0, newSubtotal - item.order.discount);
 
-    await tx.diningOrder.update({
+    const updated = await tx.diningOrder.update({
       where: { id: item.orderId },
       data: {
         subtotal: newSubtotal,
         totalAmount: newTotal,
+      },
+      include: {
+        table: true,
+        items: true,
+        payments: true,
       },
     });
 
@@ -307,7 +312,7 @@ export async function removeOrderItem(
       },
     });
 
-    return { success: true };
+    return updated;
   }, TX_OPTIONS);
 }
 
@@ -696,12 +701,17 @@ export async function updateOrderItem(
 
     const newTotalAmount = Math.max(0, newSubtotal - discount);
 
-    await tx.diningOrder.update({
+    const updatedOrder = await tx.diningOrder.update({
       where: { id: item.orderId },
       data: {
         subtotal: newSubtotal,
         discount,
         totalAmount: newTotalAmount,
+      },
+      include: {
+        table: true,
+        items: true,
+        payments: true,
       },
     });
 
@@ -720,7 +730,7 @@ export async function updateOrderItem(
       },
     });
 
-    return updatedItem;
+    return { item: updatedItem, order: updatedOrder };
   }, TX_OPTIONS);
 }
 

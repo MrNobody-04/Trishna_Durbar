@@ -5,14 +5,13 @@ declare global {
   var cachedPrisma: PrismaClient | undefined;
 }
 
+// Ensure single shared Prisma instance across serverless lambda executions
 const prisma =
   global.cachedPrisma ||
   new PrismaClient({
     log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],
   });
 
-if (process.env.NODE_ENV !== "production") {
-  global.cachedPrisma = prisma;
-}
+global.cachedPrisma = prisma;
 
 export default prisma;

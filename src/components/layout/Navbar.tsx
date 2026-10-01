@@ -119,11 +119,11 @@ export function Navbar() {
         {/* User Identity, Theme Toggle & Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
           {user && (
-            <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-secondary/80 dark:bg-[#15120c] border border-amber-500/35 shadow-xs">
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-secondary/80 dark:bg-[#15120c] border border-amber-500/35 shadow-xs">
               <div className="h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/30" />
               <div className="text-left">
-                <p className="text-[11px] font-black text-foreground leading-tight">{user.name}</p>
-                <p className="text-[9px] font-bold text-amber-600 dark:text-amber-400 tracking-wide">
+                <p className="text-xs font-black text-foreground leading-tight">{user.name}</p>
+                <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 tracking-wide">
                   👑 {getRoleBadge(user.role)}
                 </p>
               </div>
@@ -200,7 +200,28 @@ export function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="sm:hidden border-t border-amber-500/20 bg-card dark:bg-[#0d0b07] p-4 space-y-2 animate-in slide-in-from-top-2 duration-150 shadow-xl">
+        <div className="sm:hidden border-t border-amber-500/20 bg-card dark:bg-[#0d0b07] p-4 space-y-3 animate-in slide-in-from-top-2 duration-150 shadow-xl">
+          {/* User Profile Card on Mobile */}
+          {user && (
+            <div className="p-3 rounded-2xl bg-secondary/80 dark:bg-white/[0.04] border border-amber-500/30 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="h-9 w-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center font-black text-amber-600 dark:text-amber-400 text-sm">
+                  {user.name.charAt(0)}
+                </div>
+                <div>
+                  <p className="text-xs font-black text-foreground">{user.name}</p>
+                  <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400">
+                    👑 {getRoleBadge(user.role)}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/25">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Active</span>
+              </div>
+            </div>
+          )}
+
           <div className="pb-2 border-b border-border text-xs text-muted-foreground flex items-center justify-between">
             <span className="font-mono font-bold">{nepalTime}</span>
             <span className="font-bold text-amber-600 dark:text-amber-400">NST Kathmandu</span>

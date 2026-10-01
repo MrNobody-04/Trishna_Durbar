@@ -64,19 +64,19 @@ export default function LoginPage() {
           {/* Header */}
           <div className="text-center space-y-2 relative flex flex-col items-center">
             <RoyalDurbarLogo size="lg" showText={false} />
-            <h1 className="text-2xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-amber-500 to-amber-700 dark:from-amber-300 dark:via-yellow-200 dark:to-amber-500">
+            <h1 className="text-2xl font-black tracking-wider text-foreground">
               TRISHNA DURBAR
             </h1>
-            <p className="text-xs text-amber-700 dark:text-amber-300 font-bold">
+            <p className="text-xs text-amber-600 dark:text-amber-400 font-bold">
               तृष्णा दरबार रेष्टुरेन्ट एण्ड बार
             </p>
-            <p className="text-[11px] text-muted-foreground">
-              Operations & Management Portal • Front Desk & POS
+            <p className="text-xs text-muted-foreground">
+              Staff & Management Portal
             </p>
           </div>
 
           {/* Secure Production Login Form */}
-          <form onSubmit={handleLogin} className="mt-7 space-y-4">
+          <form onSubmit={handleLogin} className="mt-6 space-y-4">
             <div>
               <label className="text-xs font-bold text-foreground block mb-1.5">
                 Staff Email
@@ -97,7 +97,7 @@ export default function LoginPage() {
 
             <div>
               <label className="text-xs font-bold text-foreground block mb-1.5">
-                Security Password
+                Password
               </label>
               <div className="relative">
                 <KeyRound className="absolute left-3.5 top-3.5 h-4 w-4 text-amber-500 pointer-events-none" />
@@ -128,23 +128,23 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-3 py-3 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-amber-400 disabled:opacity-50 shadow-lg shadow-amber-500/25 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+              className="w-full mt-2 py-3 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-400 disabled:opacity-50 shadow-md shadow-amber-500/20 transition-all active:scale-[0.99] flex items-center justify-center gap-2"
             >
               {loading ? (
-                <span>Authenticating Securely...</span>
+                <span>Signing in...</span>
               ) : (
                 <>
-                  <span>Sign In to Durbar Portal</span>
-                  <ArrowRight className="h-4 w-4" />
+                  <span>Sign In</span>
+                  <ArrowRight className="h-4 w-4 stroke-[2.5]" />
                 </>
               )}
             </button>
           </form>
 
-          {/* Security Credentials Footer */}
-          <div className="mt-6 pt-4 border-t border-border flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground text-center">
-            <Lock className="h-3 w-3 text-amber-500" />
-            <span>256-bit Encrypted Session • Authorized Staff Only</span>
+          {/* Professional Footer */}
+          <div className="mt-6 pt-4 border-t border-border flex items-center justify-center gap-1.5 text-xs text-muted-foreground text-center">
+            <Lock className="h-3.5 w-3.5 text-amber-500" />
+            <span>Authorized Staff Personnel Only</span>
           </div>
         </div>
       </div>

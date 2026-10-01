@@ -240,15 +240,29 @@ export function LiveBillModal({
       onRefresh();
     } catch (err: any) {
       toast.error(err.message || "Failed to update quantity");
+      onRefresh();
     } finally {
       setUpdatingItemId(null);
     }
   };
 
-  // 6. REMOVE DISH FROM ORDER
+  // 6. REMOVE DISH FROM ORDER (Instant Optimistic & Server Sync)
   const handleRemoveItem = async (itemId?: string) => {
     if (!itemId) return;
     try {
+      // Optimistic local update so dish disappears immediately
+      if (localOrder?.items) {
+        const remaining = localOrder.items.filter((it) => it.id !== itemId);
+        const newSub = remaining.reduce((sum, it) => sum + it.total, 0);
+        const newTot = Math.max(0, newSub - (localOrder.discount || 0));
+        setLocalOrder({
+          ...localOrder,
+          items: remaining,
+          subtotal: newSub,
+          totalAmount: newTot,
+        });
+      }
+
       const res = await fetch(`/api/orders/${currentOrder.id}/items?itemId=${itemId}`, {
         method: "DELETE",
       });
@@ -260,6 +274,35 @@ export function LiveBillModal({
       onRefresh();
     } catch (err: any) {
       toast.error(err.message || "Failed to remove dish");
+      onRefresh();
+    }
+  };
+
+  // 6b. VOID / CANCEL ENTIRE BILL (Frees table, records in history, zero revenue impact)
+  const [cancellingBill, setCancellingBill] = useState(false);
+  const handleVoidBill = async () => {
+    const confirmed = window.confirm(
+      `Are you sure you want to cancel and delete this entire bill for ${table?.name}?\n\n• The table will be immediately cleared and marked available.\n• The bill will remain in history & audit trail as CANCELLED.\n• The amount will NOT be counted in revenue or sales.`
+    );
+    if (!confirmed) return;
+
+    setCancellingBill(true);
+    try {
+      const res = await fetch(`/api/orders/${currentOrder.id}/cancel`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: "Voided/Deleted by staff in POS" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to cancel bill");
+
+      toast.success(`Bill for ${table?.name} cancelled and table cleared!`);
+      onRefresh();
+      onClose();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to void bill");
+    } finally {
+      setCancellingBill(false);
     }
   };
 
@@ -744,6 +787,17 @@ export function LiveBillModal({
                 className="w-full py-3 rounded-2xl text-xs font-black uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-amber-400 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-amber-500/25 transition-all active:scale-[0.99]"
               >
                 {settling ? "Settling Table..." : `Settle & Vacate ${table.name}`}
+              </button>
+
+              {/* Void / Delete Bill Button */}
+              <button
+                type="button"
+                disabled={cancellingBill}
+                onClick={handleVoidBill}
+                className="w-full py-2.5 rounded-xl text-xs font-bold text-red-600 dark:text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 transition-all flex items-center justify-center gap-1.5"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                <span>{cancellingBill ? "Cancelling Bill..." : "Void / Delete Entire Bill (Free Table)"}</span>
               </button>
             </div>
 

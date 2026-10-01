@@ -21,6 +21,10 @@ export const metadata: Metadata = {
   description:
     "High-precision restaurant operations, 3D floor management, live billing, KOT, and financial management platform for Trishna Durbar Restaurant.",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

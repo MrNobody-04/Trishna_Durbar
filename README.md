@@ -51,16 +51,22 @@ Developed with an advanced **Regal Durbar Gold & Royal Obsidian** color scheme, 
 
 ---
 
-## 2. Dual Role Access & Pre-configured Credentials
+## 2. Dual-Role Administrative Security Architecture
 
-Both Owner and Manager have **100% equal operational and administrative powers**:
+Both the **Owner** and **Manager** roles are configured with **100% equal operational and administrative powers** to manage the restaurant:
+- **3D Floor & Table Matrix**: Occupy, transfer, free tables, and monitor party sizes.
+- **Full Digital Menu**: Add, edit, adjust prices, toggle item availability, and build combo platters.
+- **Live Table Billing & Checkout**: Real-time running bill, KOT generation, split payments (Cash, Fonepay QR, Card), and final settlement.
+- **Hotel & Restaurant Expenses**: Comprehensive categorized outflow tracking.
+- **Real-Time Analytics**: Sales, expenses, and net profit charts.
+- **Payment QR Code**: Set up and update Fonepay and banking QR codes.
+- **Audit Logs**: Complete timestamped traceability for operational safety.
 
-| Role | Email Address | Password | Privileges |
-|---|---|---|---|
-| **Owner** | `owner@trishnadurbar.com` | `DurbarOwner@2026` | 100% Full Access: Tables, Orders, Billing, Menu, Expenses, Analytics, QR, Audit |
-| **Manager** | `manager@trishnadurbar.com` | `DurbarManager@2026` | 100% Full Access: Tables, Orders, Billing, Menu, Expenses, Analytics, QR, Audit |
-
-*The login page includes 1-click Quick-Fill buttons for both accounts.*
+### 🔐 Security & Access Control
+- All passwords are encrypted with bcrypt (10 rounds).
+- HTTP-only cookie sessions signed with 256-bit encrypted JSON Web Tokens (`jose`).
+- Initial administrative accounts are populated securely via environment variables during database seeding (`INITIAL_OWNER_EMAIL`, `INITIAL_OWNER_PASSWORD`, `INITIAL_MANAGER_EMAIL`, `INITIAL_MANAGER_PASSWORD`).
+- No hardcoded or default credentials exist in client-facing production code.
 
 ---
 
@@ -69,19 +75,20 @@ Both Owner and Manager have **100% equal operational and administrative powers**
 * **Framework:** Next.js 15 (App Router, Server Actions, Route Handlers)
 * **Language:** TypeScript 5.7 (Strict Mode)
 * **Styling & 3D:** Tailwind CSS, CSS 3D Perspective Transforms (`rotateX`, `rotateY`, `translateZ`, specular glass reflection)
-* **Database & ORM:** Prisma 6 ORM with SQLite (`file:./dev.db`) + PostgreSQL switchable
+* **Database & ORM:** Prisma 6 ORM with SQLite (`file:./dev.db`) for local offline dev + PostgreSQL for Supabase / Vercel cloud production
 * **Theme:** Regal Durbar Gold & Royal Obsidian with `next-themes` (Dark / Light)
 * **Visualizations:** Recharts
 * **Notifications:** Sonner Toast Provider
 * **Timezone:** Nepal Standard Time (`Asia/Kathmandu`, UTC+5:45)
-* **Signature Footer:** **Developed by SUJANGC**
+* **Signature Branding:** **Developed by SUJANGC**
 
 ---
 
-## 4. Quick Start & Running Locally
+## 4. Quick Start Guide
 
+### Option A: Local Development (SQLite — Zero Configuration)
 ```bash
-# 1. Install dependencies (if fresh clone)
+# 1. Switch to SQLite and seed local database
 npm run db:sqlite
 
 # 2. Start development server
@@ -89,4 +96,17 @@ npm run dev
 
 # 3. Open in browser
 http://localhost:3000
+```
+
+### Option B: Cloud Production (Supabase PostgreSQL + Vercel)
+See the deployment instructions in the documentation or run:
+```bash
+# 1. Switch Prisma schema to PostgreSQL
+npm run db:postgres
+
+# 2. Sync schema to Supabase
+npm run prisma:push
+
+# 3. Seed Supabase with menu, tables, and admin accounts
+npm run prisma:seed
 ```

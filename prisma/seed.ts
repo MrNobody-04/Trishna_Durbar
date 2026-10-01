@@ -6,16 +6,21 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Seeding Trishna Durbar database...");
 
-  // 1. Seed Owner and Manager Accounts
-  const ownerPasswordHash = await bcrypt.hash("DurbarOwner@2026", 10);
-  const managerPasswordHash = await bcrypt.hash("DurbarManager@2026", 10);
+  // 1. Seed Owner and Manager Accounts (using environment variables if provided)
+  const ownerEmail = process.env.INITIAL_OWNER_EMAIL || "owner@trishnadurbar.com";
+  const ownerPassword = process.env.INITIAL_OWNER_PASSWORD || "TrishnaOwner#2026!";
+  const managerEmail = process.env.INITIAL_MANAGER_EMAIL || "manager@trishnadurbar.com";
+  const managerPassword = process.env.INITIAL_MANAGER_PASSWORD || "TrishnaManager#2026!";
+
+  const ownerPasswordHash = await bcrypt.hash(ownerPassword, 10);
+  const managerPasswordHash = await bcrypt.hash(managerPassword, 10);
 
   const owner = await prisma.user.upsert({
-    where: { email: "owner@trishnadurbar.com" },
+    where: { email: ownerEmail },
     update: { passwordHash: ownerPasswordHash, role: "OWNER", isActive: true },
     create: {
       name: "Durbar Owner",
-      email: "owner@trishnadurbar.com",
+      email: ownerEmail,
       passwordHash: ownerPasswordHash,
       role: "OWNER",
       isActive: true,
@@ -23,18 +28,18 @@ async function main() {
   });
 
   const manager = await prisma.user.upsert({
-    where: { email: "manager@trishnadurbar.com" },
+    where: { email: managerEmail },
     update: { passwordHash: managerPasswordHash, role: "MANAGER", isActive: true },
     create: {
       name: "Durbar Manager",
-      email: "manager@trishnadurbar.com",
+      email: managerEmail,
       passwordHash: managerPasswordHash,
       role: "MANAGER",
       isActive: true,
     },
   });
 
-  console.log("Created users:", owner.email, manager.email);
+  console.log(`Seeded administrative accounts for: ${owner.email} and ${manager.email}`);
 
   // 2. Seed 9 Tables Across 4 Zones
   const tables = [

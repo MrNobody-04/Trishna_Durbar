@@ -11,6 +11,12 @@ export class AuthError extends Error {
   }
 }
 
+const userStatusCache = new Map<
+  string,
+  { user: SessionUser; isActive: boolean; cachedAt: number }
+>();
+const CACHE_TTL_MS = 60 * 1000; // 60 seconds TTL
+
 /**
  * Require an authenticated active user (Owner or Manager)
  */
@@ -20,6 +26,14 @@ export async function requireAuth(): Promise<SessionUser> {
     throw new AuthError("Authentication required", 401);
   }
 
+  const cached = userStatusCache.get(session.id);
+  if (cached && Date.now() - cached.cachedAt < CACHE_TTL_MS) {
+    if (!cached.isActive) {
+      throw new AuthError("User account is inactive or no longer exists", 403);
+    }
+    return cached.user;
+  }
+
   // Verify in database that user exists and is still active
   const user = await prisma.user.findUnique({
     where: { id: session.id },
@@ -27,15 +41,30 @@ export async function requireAuth(): Promise<SessionUser> {
   });
 
   if (!user || !user.isActive) {
+    if (user) {
+      userStatusCache.set(session.id, {
+        user: { id: user.id, name: user.name, email: user.email, role: user.role as Role },
+        isActive: false,
+        cachedAt: Date.now(),
+      });
+    }
     throw new AuthError("User account is inactive or no longer exists", 403);
   }
 
-  return {
+  const sessionUser: SessionUser = {
     id: user.id,
     name: user.name,
     email: user.email,
     role: user.role as Role,
   };
+
+  userStatusCache.set(session.id, {
+    user: sessionUser,
+    isActive: true,
+    cachedAt: Date.now(),
+  });
+
+  return sessionUser;
 }
 
 /**

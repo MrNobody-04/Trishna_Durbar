@@ -32,14 +32,23 @@ export function Navbar() {
   const [nepalTime, setNepalTime] = useState<string>("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const isAuth = Boolean(user && pathname !== "/login");
+
   useEffect(() => {
     setMounted(true);
+    if (pathname === "/login") {
+      setUser(null);
+      return;
+    }
     fetch("/api/auth/me")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.user) setUser(data.user);
+        else setUser(null);
       })
-      .catch(() => {});
+      .catch(() => {
+        setUser(null);
+      });
 
     const updateTime = () => {
       const now = new Date();
@@ -59,23 +68,26 @@ export function Navbar() {
     updateTime();
     const timer = setInterval(updateTime, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [pathname]);
 
   const handleLogout = async () => {
     try {
+      setUser(null);
+      setMobileMenuOpen(false);
       await fetch("/api/auth/logout", { method: "POST" });
       toast.success("Logged out successfully");
-      router.push("/login");
-      router.refresh();
+      window.location.href = "/login";
     } catch {
-      toast.error("Logout failed");
+      window.location.href = "/login";
     }
   };
 
-  const getRoleBadge = (role: string) => {
+  const getRoleBadge = (role?: string) => {
     switch (role) {
+      case "OWNER":
       case "SUPER_ADMIN":
-        return "Royal Admin";
+        return "Royal Owner";
+      case "MANAGER":
       case "ADMIN":
         return "Manager";
       case "CASHIER":
@@ -85,7 +97,7 @@ export function Navbar() {
       case "KITCHEN":
         return "Master Chef";
       default:
-        return role;
+        return role || "Staff";
     }
   };
 
@@ -103,7 +115,7 @@ export function Navbar() {
       {/* Top Royal Header Bar */}
       <div className="mx-auto flex max-w-7xl items-center justify-between px-3 sm:px-6 py-2">
         {/* Brand Logo with Royal Crest */}
-        <Link href="/" className="group transition-transform active:scale-95">
+        <Link href={isAuth ? "/" : "/login"} className="group transition-transform active:scale-95">
           <RoyalDurbarLogo size="md" />
         </Link>
 
@@ -118,11 +130,11 @@ export function Navbar() {
 
         {/* User Identity, Theme Toggle & Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {user && (
+          {isAuth && user && (
             <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-secondary/80 dark:bg-[#15120c] border border-amber-500/35 shadow-xs">
               <div className="h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/30" />
               <div className="text-left">
-                <p className="text-xs font-black text-foreground leading-tight">{user.name}</p>
+                <p className="text-xs font-black text-foreground leading-tight">{user.name || "Staff"}</p>
                 <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 tracking-wide">
                   👑 {getRoleBadge(user.role)}
                 </p>
@@ -147,69 +159,75 @@ export function Navbar() {
             </button>
           )}
 
-          {/* Logout Button (Desktop) */}
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-red-500 hover:text-red-400 hover:bg-red-500/10 border border-red-500/30 transition-all active:translate-y-0.5"
-            title="End Session"
-          >
-            <LogOut className="h-3.5 w-3.5" />
-            <span>Logout</span>
-          </button>
+          {/* Logout Button (Desktop) - Only show when authenticated */}
+          {isAuth && (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-red-500 hover:text-red-400 hover:bg-red-500/10 border border-red-500/30 transition-all active:translate-y-0.5"
+              title="End Session"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span>Logout</span>
+            </button>
+          )}
 
-          {/* Mobile Menu Hamburger */}
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="sm:hidden p-2 rounded-xl bg-secondary border border-border text-foreground active:scale-95"
-            aria-label="Open mobile menu"
-          >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
-          </button>
+          {/* Mobile Menu Hamburger - Only show when authenticated */}
+          {isAuth && (
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="sm:hidden p-2 rounded-xl bg-secondary border border-border text-foreground active:scale-95"
+              aria-label="Open mobile menu"
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Desktop Segmented Navigation Ribbon */}
-      <nav className="hidden sm:block border-t border-amber-500/15 bg-card/60 dark:bg-[#0c0a07]/80 px-3 sm:px-6 overflow-x-auto scrollbar-none">
-        <div className="mx-auto flex max-w-7xl items-center gap-1.5 py-1.5">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-150 border ${
-                  isActive
-                    ? "bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-slate-950 border-amber-400 shadow-[0_2px_8px_rgba(245,158,11,0.25)] font-black"
-                    : "text-foreground/80 hover:text-foreground bg-transparent border-transparent hover:border-amber-500/30 hover:bg-amber-500/5"
-                }`}
-              >
-                <Icon
-                  className={`h-3.5 w-3.5 ${
-                    isActive ? "text-slate-950" : "text-amber-500"
+      {/* Desktop Segmented Navigation Ribbon - Only visible when authenticated */}
+      {isAuth && (
+        <nav className="hidden sm:block border-t border-amber-500/15 bg-card/60 dark:bg-[#0c0a07]/80 px-3 sm:px-6 overflow-x-auto scrollbar-none">
+          <div className="mx-auto flex max-w-7xl items-center gap-1.5 py-1.5">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-150 border ${
+                    isActive
+                      ? "bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-slate-950 border-amber-400 shadow-[0_2px_8px_rgba(245,158,11,0.25)] font-black"
+                      : "text-foreground/80 hover:text-foreground bg-transparent border-transparent hover:border-amber-500/30 hover:bg-amber-500/5"
                   }`}
-                />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+                >
+                  <Icon
+                    className={`h-3.5 w-3.5 ${
+                      isActive ? "text-slate-950" : "text-amber-500"
+                    }`}
+                  />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      )}
 
-      {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
+      {/* Mobile Drawer Menu - Only visible when authenticated */}
+      {isAuth && mobileMenuOpen && (
         <div className="sm:hidden border-t border-amber-500/20 bg-card dark:bg-[#0d0b07] p-4 space-y-3 animate-in slide-in-from-top-2 duration-150 shadow-xl">
           {/* User Profile Card on Mobile */}
           {user && (
             <div className="p-3 rounded-2xl bg-secondary/80 dark:bg-white/[0.04] border border-amber-500/30 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="h-9 w-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center font-black text-amber-600 dark:text-amber-400 text-sm">
-                  {user.name.charAt(0)}
+                  {user.name ? user.name.charAt(0).toUpperCase() : "U"}
                 </div>
                 <div>
-                  <p className="text-xs font-black text-foreground">{user.name}</p>
+                  <p className="text-xs font-black text-foreground">{user.name || "Staff"}</p>
                   <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400">
                     👑 {getRoleBadge(user.role)}
                   </p>

@@ -430,7 +430,8 @@ export async function markKotPrinted(orderId: string) {
 export async function settleDiningOrder(
   orderId: string,
   userId: string,
-  userName: string
+  userName: string,
+  autoPayMethod?: string
 ) {
   return await prisma.$transaction(async (tx) => {
     const order = await tx.diningOrder.findUnique({
@@ -442,17 +443,31 @@ export async function settleDiningOrder(
       throw new Error("Active order not found");
     }
 
-    const remaining = order.totalAmount - order.paidAmount;
+    const remaining = Math.round((order.totalAmount - order.paidAmount) * 100) / 100;
+    let finalPaidAmount = order.paidAmount;
+
     if (remaining > 0.01) {
-      throw new Error(
-        `Cannot settle table with unpaid balance of Rs. ${remaining.toFixed(2)}. Please record payment first.`
-      );
+      // Auto-record the remaining balance with payment method so settlement succeeds seamlessly
+      const validMethod = ["CASH", "QR_PAYMENT", "CARD", "BANK_TRANSFER"].includes(autoPayMethod || "")
+        ? (autoPayMethod as any)
+        : "CASH";
+
+      await tx.diningPayment.create({
+        data: {
+          orderId,
+          amount: remaining,
+          method: validMethod,
+          notes: "Settled at checkout",
+        },
+      });
+      finalPaidAmount = order.totalAmount;
     }
 
     const settled = await tx.diningOrder.update({
       where: { id: orderId },
       data: {
         status: "COMPLETED",
+        paidAmount: finalPaidAmount,
         settledAt: new Date(),
       },
     });
@@ -472,7 +487,8 @@ export async function settleDiningOrder(
       metadata: {
         tableName: order.table.name,
         totalAmount: order.totalAmount,
-        paidAmount: order.paidAmount,
+        paidAmount: finalPaidAmount,
+        autoRecordedPayment: remaining > 0.01,
       },
     });
 

@@ -10,7 +10,15 @@ export async function POST(
     const user = await requireAuth();
     const { id } = await params;
 
-    const settled = await settleDiningOrder(id, user.id, user.name);
+    let autoPayMethod: string | undefined;
+    try {
+      const body = await req.json();
+      autoPayMethod = body?.autoPayMethod;
+    } catch {
+      // Body is optional
+    }
+
+    const settled = await settleDiningOrder(id, user.id, user.name, autoPayMethod || "CASH");
 
     return NextResponse.json({ success: true, order: settled });
   } catch (error: any) {

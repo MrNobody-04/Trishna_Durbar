@@ -343,21 +343,14 @@ export function LiveBillModal({
     }
   };
 
-  // 8. SETTLE & VACATE TABLE
+  // 8. SETTLE & VACATE TABLE (1-tap complete checkout)
   const handleSettleAndRelease = async () => {
-    if (balanceRemaining > 0.01) {
-      toast.error(
-        `Cannot settle table with unpaid balance of ${formatNpr(
-          balanceRemaining
-        )}. Please record payment first.`
-      );
-      return;
-    }
-
     setSettling(true);
     try {
       const res = await fetch(`/api/orders/${currentOrder.id}/settle`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ autoPayMethod: paymentMethod || "CASH" }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to settle table");
@@ -782,11 +775,18 @@ export function LiveBillModal({
 
               <button
                 type="button"
-                disabled={balanceRemaining > 0.01 || settling}
+                disabled={settling || cancellingBill}
                 onClick={handleSettleAndRelease}
-                className="w-full py-3 rounded-2xl text-xs font-black uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-amber-400 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-amber-500/25 transition-all active:scale-[0.99]"
+                className="w-full py-3.5 rounded-2xl text-xs font-black uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-amber-400 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-amber-500/25 transition-all active:scale-[0.99] flex items-center justify-center gap-2"
               >
-                {settling ? "Settling Table..." : `Settle & Vacate ${table.name}`}
+                <CheckCircle2 className="h-4 w-4" />
+                <span>
+                  {settling
+                    ? "Settling Table..."
+                    : balanceRemaining > 0.01
+                    ? `Pay Remaining & Settle ${table.name} (${formatNpr(balanceRemaining)})`
+                    : `Settle & Vacate ${table.name}`}
+                </span>
               </button>
 
               {/* Void / Delete Bill Button */}

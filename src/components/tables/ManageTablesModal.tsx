@@ -11,6 +11,8 @@ import {
   Users,
   Building2,
   HelpCircle,
+  Edit2,
+  Check,
 } from "lucide-react";
 import { DiningTableData, FloorArea } from "@/types";
 import { toast } from "sonner";
@@ -43,6 +45,56 @@ export function ManageTablesModal({
   const [tableNotes, setTableNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Table renaming & editing state
+  const [editingTableId, setEditingTableId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState("");
+  const [editingFloor, setEditingFloor] = useState<FloorArea>("GROUND");
+  const [editingCapacity, setEditingCapacity] = useState("4");
+  const [savingId, setSavingId] = useState<string | null>(null);
+
+  const handleStartEdit = (t: DiningTableData) => {
+    setEditingTableId(t.id);
+    setEditingName(t.name);
+    setEditingFloor(t.floor);
+    setEditingCapacity(t.capacity.toString());
+  };
+
+  const handleCancelEdit = () => {
+    setEditingTableId(null);
+    setEditingName("");
+  };
+
+  const handleSaveEdit = async (tableId: string) => {
+    if (!editingName.trim()) {
+      toast.error("Table name cannot be empty");
+      return;
+    }
+
+    setSavingId(tableId);
+    try {
+      const res = await fetch(`/api/tables/${tableId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editingName.trim(),
+          floor: editingFloor,
+          capacity: parseInt(editingCapacity) || 4,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update table");
+
+      toast.success(`Table renamed to "${editingName.trim()}"!`);
+      setEditingTableId(null);
+      onRefresh();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update table");
+    } finally {
+      setSavingId(null);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -292,59 +344,137 @@ export function ManageTablesModal({
                     key={t.id}
                     className="relative flex flex-col justify-between p-4 rounded-2xl bg-secondary/40 border border-border hover:border-amber-500/40 transition-colors shadow-sm"
                   >
-                    <div>
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="space-y-0.5">
-                          <p className="text-sm font-black text-foreground">{t.name}</p>
-                          <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">
-                            {t.floor}
-                          </span>
+                    {editingTableId === t.id ? (
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-[10px] font-bold text-muted-foreground block mb-1">
+                            Table Name / Identifier *
+                          </label>
+                          <input
+                            type="text"
+                            value={editingName}
+                            onChange={(e) => setEditingName(e.target.value)}
+                            className="w-full px-2.5 py-1.5 rounded-xl bg-background border border-amber-500 text-xs font-bold text-foreground focus:outline-none"
+                            autoFocus
+                            placeholder="e.g. Table 1"
+                          />
                         </div>
-                        <span
-                          className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${
-                            isOccupied
-                              ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
-                              : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
-                          }`}
-                        >
-                          {isOccupied ? "Occupied" : "Available"}
-                        </span>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="text-[10px] font-bold text-muted-foreground block mb-1">
+                              Floor Area
+                            </label>
+                            <select
+                              value={editingFloor}
+                              onChange={(e) => setEditingFloor(e.target.value as FloorArea)}
+                              className="w-full px-2 py-1.5 rounded-xl bg-background border border-border text-xs text-foreground focus:outline-none"
+                            >
+                              {FLOOR_OPTIONS.map((f) => (
+                                <option key={f.id} value={f.id}>
+                                  {f.icon} {f.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="text-[10px] font-bold text-muted-foreground block mb-1">
+                              Capacity
+                            </label>
+                            <input
+                              type="number"
+                              min="1"
+                              max="50"
+                              value={editingCapacity}
+                              onChange={(e) => setEditingCapacity(e.target.value)}
+                              className="w-full px-2 py-1.5 rounded-xl bg-background border border-border text-xs text-foreground focus:outline-none"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-2 pt-2 border-t border-border">
+                          <button
+                            type="button"
+                            onClick={handleCancelEdit}
+                            className="px-2.5 py-1 rounded-lg text-xs font-bold text-muted-foreground hover:bg-secondary border border-border"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            disabled={savingId === t.id}
+                            onClick={() => handleSaveEdit(t.id)}
+                            className="flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-400 disabled:opacity-50"
+                          >
+                            <Check className="h-3 w-3" />
+                            <span>{savingId === t.id ? "Saving..." : "Save"}</span>
+                          </button>
+                        </div>
                       </div>
+                    ) : (
+                      <>
+                        <div>
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="space-y-0.5">
+                              <p className="text-sm font-black text-foreground">{t.name}</p>
+                              <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">
+                                {t.floor}
+                              </span>
+                            </div>
+                            <span
+                              className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${
+                                isOccupied
+                                  ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
+                                  : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
+                              }`}
+                            >
+                              {isOccupied ? "Occupied" : "Available"}
+                            </span>
+                          </div>
 
-                      <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-2">
-                        <Users className="h-3.5 w-3.5" />
-                        <span>Capacity: {t.capacity} Guests</span>
-                      </div>
+                          <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-2">
+                            <Users className="h-3.5 w-3.5" />
+                            <span>Capacity: {t.capacity} Guests</span>
+                          </div>
 
-                      {t.notes && (
-                        <p className="text-[10px] text-muted-foreground mt-1 italic line-clamp-1">
-                          {t.notes}
-                        </p>
-                      )}
-                    </div>
+                          {t.notes && (
+                            <p className="text-[10px] text-muted-foreground mt-1 italic line-clamp-1">
+                              {t.notes}
+                            </p>
+                          )}
+                        </div>
 
-                    <div className="pt-3 mt-3 border-t border-border flex items-center justify-between">
-                      <span className="text-[10px] text-muted-foreground">
-                        {isOccupied ? "Has active guest" : "Ready for guests"}
-                      </span>
+                        <div className="pt-3 mt-3 border-t border-border flex items-center justify-between">
+                          <button
+                            type="button"
+                            onClick={() => handleStartEdit(t)}
+                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all active:scale-95"
+                            title="Rename or Edit this Table"
+                          >
+                            <Edit2 className="h-3 w-3" />
+                            <span>Rename</span>
+                          </button>
 
-                      <button
-                        onClick={() => handleDeleteTable(t)}
-                        disabled={isOccupied || deletingId === t.id}
-                        title={
-                          isOccupied
-                            ? "Cannot remove table while occupied"
-                            : "Remove this table"
-                        }
-                        className={`p-1.5 rounded-lg text-xs transition-colors ${
-                          isOccupied
-                            ? "text-muted-foreground/40 cursor-not-allowed"
-                            : "text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
-                        }`}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
+                          <button
+                            onClick={() => handleDeleteTable(t)}
+                            disabled={isOccupied || deletingId === t.id}
+                            title={
+                              isOccupied
+                                ? "Cannot remove table while occupied"
+                                : "Remove this table"
+                            }
+                            className={`p-1.5 rounded-lg text-xs transition-colors ${
+                              isOccupied
+                                ? "text-muted-foreground/40 cursor-not-allowed"
+                                : "text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
+                            }`}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 );
               })}

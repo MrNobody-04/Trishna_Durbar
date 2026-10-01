@@ -63,15 +63,11 @@ export default function DashboardLandingPage() {
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [manageTablesModalOpen, setManageTablesModalOpen] = useState(false);
 
-  const fetchData = async () => {
+  const fetchTables = async () => {
     try {
-      const [tablesRes, metricsRes] = await Promise.all([
-        fetch("/api/tables"),
-        fetch("/api/analytics?period=today"),
-      ]);
-
-      if (tablesRes.ok) {
-        const tData = await tablesRes.json();
+      const res = await fetch("/api/tables");
+      if (res.ok) {
+        const tData = await res.json();
         if (tData?.tables) {
           setTables(tData.tables);
           setActiveTable((prev) => {
@@ -80,11 +76,26 @@ export default function DashboardLandingPage() {
           });
         }
       }
+    } catch {
+      // quiet fail on background polling
+    }
+  };
 
-      if (metricsRes.ok) {
-        const mData = await metricsRes.json();
+  const fetchMetrics = async () => {
+    try {
+      const res = await fetch("/api/analytics?period=today");
+      if (res.ok) {
+        const mData = await res.json();
         if (mData?.metrics) setMetrics(mData.metrics);
       }
+    } catch {
+      // quiet fail on background polling
+    }
+  };
+
+  const refreshAll = async () => {
+    try {
+      await Promise.all([fetchTables(), fetchMetrics()]);
     } catch {
       toast.error("Failed to load dashboard data");
     } finally {
@@ -93,13 +104,13 @@ export default function DashboardLandingPage() {
   };
 
   useEffect(() => {
-    fetchData();
+    refreshAll();
+    // Lightweight table status poll every 15s when modals are closed
     const interval = setInterval(() => {
-      // Avoid background polling interference while any order or payment modal is open
       if (!orderModalOpen && !billModalOpen && !printModalOpen && !qrModalOpen && !manageTablesModalOpen) {
-        fetchData();
+        fetchTables();
       }
-    }, 8000);
+    }, 15000);
     return () => clearInterval(interval);
   }, [orderModalOpen, billModalOpen, printModalOpen, qrModalOpen, manageTablesModalOpen]);
 
@@ -175,7 +186,7 @@ export default function DashboardLandingPage() {
 
             <button
               type="button"
-              onClick={fetchData}
+              onClick={refreshAll}
               className="p-2.5 rounded-xl bg-secondary/80 hover:bg-secondary border border-border hover:border-amber-500/50 text-foreground transition-all shadow-xs active:scale-[0.98]"
               title="Refresh Dashboard"
             >
@@ -498,14 +509,14 @@ export default function DashboardLandingPage() {
         table={activeTable}
         allTables={tables}
         mode={orderModalMode}
-        onOrderSuccess={fetchData}
+        onOrderSuccess={refreshAll}
       />
 
       <LiveBillModal
         isOpen={billModalOpen}
         onClose={() => setBillModalOpen(false)}
         table={activeTable}
-        onRefresh={fetchData}
+        onRefresh={refreshAll}
         onOpenAddItems={(t) => {
           setActiveTable(t);
           setBillModalOpen(false);
@@ -541,7 +552,7 @@ export default function DashboardLandingPage() {
         isOpen={manageTablesModalOpen}
         onClose={() => setManageTablesModalOpen(false)}
         tables={tables}
-        onRefresh={fetchData}
+        onRefresh={refreshAll}
       />
     </div>
   );

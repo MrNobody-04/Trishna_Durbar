@@ -356,8 +356,9 @@ export function LiveBillModal({
       if (!res.ok) throw new Error(data.error || "Failed to settle table");
 
       toast.success(`${table.name} settled and released!`);
-      onRefresh();
+      setLocalOrder(null);
       onClose();
+      onRefresh();
     } catch (err: any) {
       toast.error(err.message || "Settlement failed");
     } finally {

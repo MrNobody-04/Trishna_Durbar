@@ -51,18 +51,26 @@ export function Navbar() {
       });
 
     const updateTime = () => {
-      const now = new Date();
-      const formatted = new Intl.DateTimeFormat("en-US", {
-        timeZone: "Asia/Kathmandu",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true,
-        weekday: "short",
-        month: "short",
-        day: "numeric",
-      }).format(now);
-      setNepalTime(formatted);
+      try {
+        const now = new Date();
+        const formatted = new Intl.DateTimeFormat("en-US", {
+          timeZone: "Asia/Kathmandu",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true,
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+        }).format(now);
+        setNepalTime(formatted);
+      } catch {
+        try {
+          setNepalTime(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
+        } catch {
+          setNepalTime("");
+        }
+      }
     };
 
     updateTime();

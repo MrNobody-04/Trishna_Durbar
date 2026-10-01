@@ -433,7 +433,7 @@ export async function settleDiningOrder(
   userName: string,
   autoPayMethod?: string
 ) {
-  return await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const order = await tx.diningOrder.findUnique({
       where: { id: orderId },
       include: { table: true, payments: true },
@@ -445,13 +445,12 @@ export async function settleDiningOrder(
 
     const remaining = Math.round((order.totalAmount - order.paidAmount) * 100) / 100;
     let finalPaidAmount = order.paidAmount;
+    const validMethod = ["CASH", "QR_PAYMENT", "CARD", "BANK_TRANSFER"].includes(autoPayMethod || "")
+      ? (autoPayMethod as any)
+      : "CASH";
 
     if (remaining > 0.01) {
       // Auto-record the remaining balance with payment method so settlement succeeds seamlessly
-      const validMethod = ["CASH", "QR_PAYMENT", "CARD", "BANK_TRANSFER"].includes(autoPayMethod || "")
-        ? (autoPayMethod as any)
-        : "CASH";
-
       await tx.diningPayment.create({
         data: {
           orderId,
@@ -468,6 +467,7 @@ export async function settleDiningOrder(
       data: {
         status: "COMPLETED",
         paidAmount: finalPaidAmount,
+        paymentMethod: order.paymentMethod || validMethod,
         settledAt: new Date(),
       },
     });
@@ -478,22 +478,31 @@ export async function settleDiningOrder(
       data: { status: "AVAILABLE" },
     });
 
-    await logAuditEvent({
-      userId,
-      userName,
-      action: "SETTLE_DINING_ORDER",
-      entity: "DiningOrder",
-      entityId: orderId,
-      metadata: {
-        tableName: order.table.name,
-        totalAmount: order.totalAmount,
-        paidAmount: finalPaidAmount,
-        autoRecordedPayment: remaining > 0.01,
-      },
-    });
-
-    return settled;
+    return {
+      settled,
+      tableName: order.table.name,
+      totalAmount: order.totalAmount,
+      paidAmount: finalPaidAmount,
+      autoPaid: remaining > 0.01,
+    };
   }, TX_OPTIONS);
+
+  // Run audit log outside transaction so it never delays settlement response
+  logAuditEvent({
+    userId,
+    userName,
+    action: "SETTLE_DINING_ORDER",
+    entity: "DiningOrder",
+    entityId: orderId,
+    metadata: {
+      tableName: result.tableName,
+      totalAmount: result.totalAmount,
+      paidAmount: result.paidAmount,
+      autoRecordedPayment: result.autoPaid,
+    },
+  }).catch(() => {});
+
+  return result.settled;
 }
 
 export async function cancelDiningOrder(

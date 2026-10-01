@@ -48,6 +48,7 @@ const FLOORS: { id: string; label: string; sub: string; icon: string }[] = [
 ];
 
 export default function DashboardLandingPage() {
+  const [mounted, setMounted] = useState(false);
   const [tables, setTables] = useState<DiningTableData[]>([]);
   const [metrics, setMetrics] = useState<any>(null);
   const [selectedFloor, setSelectedFloor] = useState<string>("ALL");
@@ -104,6 +105,7 @@ export default function DashboardLandingPage() {
   };
 
   useEffect(() => {
+    setMounted(true);
     refreshAll();
     // Lightweight table status poll every 15s when modals are closed
     const interval = setInterval(() => {
@@ -332,10 +334,6 @@ export default function DashboardLandingPage() {
                 setOrderModalMode("ADD_ITEMS");
                 setOrderModalOpen(true);
               }}
-              onSettle={(t) => {
-                setActiveTable(t);
-                setBillModalOpen(true);
-              }}
               onPrintKot={(t) => {
                 setActiveTable(t);
                 setPrintMode("KOT");
@@ -369,28 +367,34 @@ export default function DashboardLandingPage() {
                 </Link>
               </div>
 
-              <div className="h-60 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={comparisonData}>
-                    <XAxis dataKey="name" stroke="#94A3B8" fontSize={11} />
-                    <YAxis stroke="#94A3B8" fontSize={11} tickFormatter={(v) => `Rs.${v}`} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        borderColor: "#F59E0B",
-                        borderRadius: "12px",
-                        color: "hsl(var(--foreground))",
-                        fontSize: "12px",
-                      }}
-                      formatter={(v: any) => [formatNpr(Number(v)), "Amount"]}
-                    />
-                    <Bar dataKey="amount" radius={[8, 8, 0, 0]}>
-                      {comparisonData.map((e, idx) => (
-                        <Cell key={`cell-${idx}`} fill={e.fill} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+              <div className="h-60 w-full flex items-center justify-center">
+                {mounted && comparisonData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={comparisonData}>
+                      <XAxis dataKey="name" stroke="#94A3B8" fontSize={11} />
+                      <YAxis stroke="#94A3B8" fontSize={11} tickFormatter={(v) => `Rs.${v}`} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          borderColor: "#F59E0B",
+                          borderRadius: "12px",
+                          color: "hsl(var(--foreground))",
+                          fontSize: "12px",
+                        }}
+                        formatter={(v: any) => [formatNpr(Number(v)), "Amount"]}
+                      />
+                      <Bar dataKey="amount" radius={[8, 8, 0, 0]}>
+                        {comparisonData.map((e, idx) => (
+                          <Cell key={`cell-${idx}`} fill={e.fill} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center text-xs text-muted-foreground">
+                    Loading financial telemetry...
+                  </div>
+                )}
               </div>
             </div>
           )}

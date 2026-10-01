@@ -39,6 +39,7 @@ const COLORS = [
 ];
 
 export default function AnalyticsPage() {
+  const [mounted, setMounted] = useState(false);
   const [metrics, setMetrics] = useState<any>(null);
   const [period, setPeriod] = useState<TimePeriod>("today");
   const [loading, setLoading] = useState(true);
@@ -58,6 +59,7 @@ export default function AnalyticsPage() {
   };
 
   useEffect(() => {
+    setMounted(true);
     fetchMetrics();
   }, [period]);
 
@@ -197,28 +199,32 @@ export default function AnalyticsPage() {
               </p>
             </div>
 
-            <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={comparisonData}>
-                  <XAxis dataKey="name" stroke="#94A3B8" fontSize={12} />
-                  <YAxis stroke="#94A3B8" fontSize={11} tickFormatter={(val) => `Rs.${val}`} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0F1626",
-                      borderColor: "#F59E0B",
-                      borderRadius: "12px",
-                      color: "#fff",
-                      fontSize: "12px",
-                    }}
-                    formatter={(value: any) => [formatNpr(Number(value)), "Amount"]}
-                  />
-                  <Bar dataKey="amount" radius={[8, 8, 0, 0]}>
-                    {comparisonData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="h-64 w-full flex items-center justify-center">
+              {mounted && comparisonData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={comparisonData}>
+                    <XAxis dataKey="name" stroke="#94A3B8" fontSize={12} />
+                    <YAxis stroke="#94A3B8" fontSize={11} tickFormatter={(val) => `Rs.${val}`} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#0F1626",
+                        borderColor: "#F59E0B",
+                        borderRadius: "12px",
+                        color: "#fff",
+                        fontSize: "12px",
+                      }}
+                      formatter={(value: any) => [formatNpr(Number(value)), "Amount"]}
+                    />
+                    <Bar dataKey="amount" radius={[8, 8, 0, 0]}>
+                      {comparisonData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="text-xs text-slate-500">Loading chart...</div>
+              )}
             </div>
           </div>
 
@@ -233,24 +239,28 @@ export default function AnalyticsPage() {
               </p>
             </div>
 
-            <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={metrics.floorStats}>
-                  <XAxis dataKey="name" stroke="#94A3B8" fontSize={11} />
-                  <YAxis stroke="#94A3B8" fontSize={11} tickFormatter={(val) => `Rs.${val}`} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0F1626",
-                      borderColor: "#F59E0B",
-                      borderRadius: "12px",
-                      color: "#fff",
-                      fontSize: "12px",
-                    }}
-                    formatter={(value: any) => [formatNpr(Number(value)), "Revenue"]}
-                  />
-                  <Bar dataKey="revenue" fill="#D97706" radius={[8, 8, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="h-64 w-full flex items-center justify-center">
+              {mounted && metrics.floorStats ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={metrics.floorStats}>
+                    <XAxis dataKey="name" stroke="#94A3B8" fontSize={11} />
+                    <YAxis stroke="#94A3B8" fontSize={11} tickFormatter={(val) => `Rs.${val}`} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#0F1626",
+                        borderColor: "#F59E0B",
+                        borderRadius: "12px",
+                        color: "#fff",
+                        fontSize: "12px",
+                      }}
+                      formatter={(value: any) => [formatNpr(Number(value)), "Revenue"]}
+                    />
+                    <Bar dataKey="revenue" fill="#D97706" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="text-xs text-slate-500">Loading floor telemetry...</div>
+              )}
             </div>
           </div>
 

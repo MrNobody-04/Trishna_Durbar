@@ -18,27 +18,49 @@ export function formatNpr(amount: number | null | undefined): string {
 
 export function formatNepalDateTime(date: Date | string | null | undefined): string {
   if (!date) return "-";
-  const d = typeof date === "string" ? new Date(date) : date;
-  return new Intl.DateTimeFormat("en-US", {
-    timeZone: "Asia/Kathmandu",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  }).format(d);
+  try {
+    const d = typeof date === "string" ? new Date(date) : date;
+    if (isNaN(d.getTime())) return "-";
+    return new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Kathmandu",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    }).format(d);
+  } catch {
+    try {
+      const d = typeof date === "string" ? new Date(date) : date;
+      return d && !isNaN(d.getTime()) ? d.toLocaleString() : "-";
+    } catch {
+      return "-";
+    }
+  }
 }
 
 export function formatNepalTimeOnly(date: Date | string | null | undefined): string {
   if (!date) return "-";
-  const d = typeof date === "string" ? new Date(date) : date;
-  return new Intl.DateTimeFormat("en-US", {
-    timeZone: "Asia/Kathmandu",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  }).format(d);
+  try {
+    const d = typeof date === "string" ? new Date(date) : date;
+    if (isNaN(d.getTime())) return "-";
+    return new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Kathmandu",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    }).format(d);
+  } catch {
+    try {
+      const d = typeof date === "string" ? new Date(date) : date;
+      return d && !isNaN(d.getTime())
+        ? d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        : "-";
+    } catch {
+      return "-";
+    }
+  }
 }
 
 export function getFloorLabel(floor: FloorArea | string): string {

@@ -20,7 +20,7 @@ interface Table3DCardProps {
   onOpenOrder: (table: DiningTableData) => void;
   onViewBill: (table: DiningTableData) => void;
   onAddItems: (table: DiningTableData) => void;
-  onSettle: (table: DiningTableData) => void;
+  onSettle?: (table: DiningTableData) => void;
   onPrintKot: (table: DiningTableData) => void;
 }
 
@@ -234,50 +234,44 @@ export function Table3DCard({
         {/* Card Footer Actions */}
         <div className="mt-4 pt-3 border-t border-border">
           {isOccupied && activeOrder ? (
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onAddItems(table);
-                }}
-                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 shadow-sm transition-all hover:scale-[1.02]"
-              >
-                <Utensils className="h-3.5 w-3.5" />
-                Add Food
-              </button>
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddItems(table);
+                  }}
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 shadow-sm transition-all hover:scale-[1.01]"
+                >
+                  <Utensils className="h-3.5 w-3.5" />
+                  Add Food
+                </button>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPrintKot(table);
+                  }}
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-foreground bg-secondary hover:bg-secondary/80 border border-border transition-colors"
+                  title="Print Kitchen Order Ticket"
+                >
+                  <Printer className="h-3.5 w-3.5 text-amber-500" />
+                  Print KOT
+                </button>
+              </div>
 
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   onViewBill(table);
                 }}
-                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-foreground bg-secondary hover:bg-secondary/80 border border-border transition-all hover:scale-[1.02]"
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-black text-amber-700 dark:text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 shadow-xs transition-all hover:scale-[1.01]"
               >
                 <Receipt className="h-3.5 w-3.5 text-amber-500" />
-                Live Bill
-              </button>
-
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPrintKot(table);
-                }}
-                className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium text-foreground bg-secondary hover:bg-secondary/80 border border-border transition-colors"
-                title="Print Kitchen Order Ticket"
-              >
-                <Printer className="h-3 w-3 text-amber-500" />
-                Print KOT
-              </button>
-
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSettle(table);
-                }}
-                className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-emerald-600 dark:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 transition-colors"
-              >
-                <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                Settle / Free
+                <span>Live Bill & Settle ({formatNpr(activeOrder.totalAmount)})</span>
               </button>
             </div>
           ) : (

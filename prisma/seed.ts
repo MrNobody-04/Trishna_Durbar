@@ -284,43 +284,7 @@ async function main() {
     console.log("Seeded default Payment QR.");
   }
 
-  // 5. Seed Initial Restaurant Expenses
-  const existingExpense = await prisma.expense.findFirst();
-  if (!existingExpense) {
-    const expenses = [
-      {
-        title: "Fresh Chicken & Mutton Purchase (Butcher)",
-        amount: 8500,
-        category: "MEAT_PURCHASE",
-        paymentMethod: "CASH",
-        notes: "Daily fresh kitchen stock",
-        createdById: manager.id,
-      },
-      {
-        title: "Vegetables & Grocery Market",
-        amount: 3200,
-        category: "GROCERIES",
-        paymentMethod: "CASH",
-        notes: "Potatoes, onions, spices, momo cabbage and ginger garlic",
-        createdById: manager.id,
-      },
-      {
-        title: "LPG Cooking Gas Cylinders (2 Refills)",
-        amount: 3800,
-        category: "GAS",
-        paymentMethod: "CASH",
-        notes: "Kitchen commercial gas cylinders",
-        createdById: owner.id,
-      },
-    ];
-
-    for (const exp of expenses) {
-      await prisma.expense.create({ data: exp });
-    }
-    console.log("Seeded initial expenses.");
-  }
-
-  console.log("Trishna Durbar seed finished successfully!");
+  console.log("Trishna Durbar seed finished successfully with 0 demo expenses/income!");
 }
 
 main()

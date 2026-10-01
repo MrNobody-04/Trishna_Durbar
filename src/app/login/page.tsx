@@ -55,9 +55,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[82vh] flex items-center justify-center py-6 px-3">
-      <div className="w-full max-w-md perspective-container">
-        <div className="relative rounded-3xl bg-card border border-border p-6 sm:p-8 shadow-2xl transition-colors duration-200">
+    <div className="min-h-[82vh] flex items-center justify-center py-4 px-3 w-full max-w-full overflow-hidden">
+      <div className="w-full max-w-md mx-auto">
+        <div className="relative rounded-3xl bg-card border border-border p-5 sm:p-8 shadow-2xl transition-colors duration-200 overflow-hidden">
           {/* Subtle Ambient Glow */}
           <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 

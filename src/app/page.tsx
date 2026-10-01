@@ -72,7 +72,13 @@ export default function DashboardLandingPage() {
 
       if (tablesRes.ok) {
         const tData = await tablesRes.json();
-        if (tData?.tables) setTables(tData.tables);
+        if (tData?.tables) {
+          setTables(tData.tables);
+          setActiveTable((prev) => {
+            if (!prev) return null;
+            return tData.tables.find((t: DiningTableData) => t.id === prev.id) || null;
+          });
+        }
       }
 
       if (metricsRes.ok) {
